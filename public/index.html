@@ -1,18 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>niewProject</title><meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta charset="UTF-8">
+
+  <title>Airhockey</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+
   <link rel="stylesheet" type="text/css" href="/css/style.css"/>
 </head>
 <body>
   <main>
     <section>
-      <header>
-        <h1>Hello Pieter-Jan De Bruyne</h1>
-      </header>
+
+
+     <div class ="leftLobbyBox">
+      <ul class="clients">
+      </ul>
+     </div>
+
+    <canvas id="canvas" width="320" height="568" style="border: 0px;">
+      Your browser does not support canvas element.
+    </canvas>
+      <!--
+
+      <canvas id="cnvs" width="320" height="568">
+        <p>no canvas support</p>
+      </canvas>
+  -->
+
     </section>
   </main>
-  <script src="/js/script.js"></script>
+  <script>
+document.addEventListener('touchmove', function(e) {
+//e.preventDefault();
+
+
+}, false);
+
+
+</script>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/script.js"></script>
+
+
+
+
 </body>
 </html>

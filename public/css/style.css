@@ -70,8 +70,38 @@ main {
   padding-top: 30px;
   width: 960px;
   font-size: 1.8em;
+  width: 320px;
+  font-size: 1.8em;
 }
 
 h1 {
   font-size: 1.3em;
+}
+
+.nickname {
+  border: 2px solid blue;
+  display: block;
+  width: 300px;
+  float: left;
+}
+
+.ownName {
+  border: 2px solid green;
+  display: block;
+  width: 300px;
+}
+
+.connect {
+  display: block;
+  width: 100px;
+}
+
+section {
+  background-color: red;
+}
+
+svg {
+  display: block;
+  margin: 50 auto;
+  background-color: blue;
 }

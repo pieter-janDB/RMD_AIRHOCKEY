@@ -69,11 +69,19 @@ export default class Ball extends EventEmitter{
 
       console.log('botsX');
     }
-    if ((this.location.y >= 568 - this.radius) || (this.location.y <= this.radius)) {
+    if (this.location.y >= 568 - this.radius) {
       this.velocity.y = this.velocity.y * -1;
       this.acceleration.y = this.acceleration.y * -1;
       console.log('botsY');
+    }else if (this.location.y <= this.radius){
+
+      console.log('next screen');
+      if(this.location.y <= -this.radius){
+        console.log('out of bounds');
+      }
+
     }
+
   }
 
 

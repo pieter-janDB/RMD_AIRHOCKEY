@@ -6,8 +6,8 @@ module.exports = {
 
   status: Status.searching,
   socketId: '',
-  playerNumber: '',
   nickname: 'unknown player',
+  opponent: '',
   self: false,
   button: true
 };

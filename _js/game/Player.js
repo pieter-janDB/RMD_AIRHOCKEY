@@ -11,7 +11,6 @@ import EventEmitter from 'eventemitter2';
 
 let $canvas=document.querySelector('#canvas');
 let Victor = require('victor');
-let dragging = false;
 
 
 export default class Player extends EventEmitter{
@@ -82,9 +81,9 @@ export default class Player extends EventEmitter{
     console.log('test');
 
     console.log(e);
-    if (!e)
+    if (!e){
       var e = event;
-
+    }
     if (e.touches) {
       if (e.touches.length === 1) { // Only deal with one finger
         var touch = e.touches[0]; // Get the information for finger #1

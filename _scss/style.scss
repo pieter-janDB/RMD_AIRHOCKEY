@@ -22,19 +22,22 @@ h1 {
   font-size: 1.3em;
 }
 
-.nickname {
-
-  border: 2px solid blue;
+li {
   display: block;
-  width: 300px;
-    float: left;
+  width: 320px;
+  height: 100px;
 }
 
-.ownName {
+.other {
+
+  border: 2px solid blue;
+  float: left;
+}
+
+.self {
 
   border: 2px solid green;
-  display: block;
-  width: 300px;
+
 
 
 }
@@ -42,7 +45,8 @@ h1 {
 .connect {
 
   display: block;
-  width: 100px;
+  width: 320px;
+  height: 50px;
 }
 
 section {

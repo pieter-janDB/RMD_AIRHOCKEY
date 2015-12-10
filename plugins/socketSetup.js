@@ -80,6 +80,8 @@ module.exports.register = (server, options, next) => {
 
     });
 
+    socket.on('gameInvite', data => io.to(data.to).emit('gameInvite', data.from));
+
     socket.emit('id', socket.id);
 
 

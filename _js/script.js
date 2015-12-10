@@ -7,7 +7,7 @@
 // or import specific polyfills
 // import {$} from './helpers/util';
 
-let $canvas = document.querySelector('#canvas');
+
 import {Ball, Player} from './game/';
 
 import {$, html} from './helpers/util.js';
@@ -18,12 +18,10 @@ import userTpl from '../_hbs/user';
 let player = new Player();
 let ball = new Ball();
 
-
-let playersArr = [];
 let socket;
 let $clientsList = $('.clients');
-let $matchMakingKnop = $('.searchButton');
 let socketId;
+
 
 let ctx=document.querySelector('#canvas').getContext('2d');
 
@@ -60,10 +58,9 @@ const initSocket = () => {
 
           $client.querySelector('.connect').addEventListener('click', e => {
             e.preventDefault();
-            socket.emit('gameInvite', {
-              from: socketId,
-              to: 'test12345'
-            });
+
+            matchPlayers(e);
+
           });
 
         }
@@ -79,6 +76,7 @@ const initSocket = () => {
           }
 
         }else{
+          $client.setAttribute('class', 'other');
           $clientsList.appendChild($client);
 
         }
@@ -86,26 +84,7 @@ const initSocket = () => {
     }
   });
 
-  //als je zelf joint
-  socket.on('join', client => {
 
-    let $el = html(userTpl(client));
-    $clientsList.appendChild($el);
-  });
-
-  //stel eigen id in als socketId
-  socket.on('id', id => {
-
-    socketId = id;
-  });
-
-  //als er iemand disconnect
-  socket.on('leave', socketIdToRemove => {
-
-    let $el = $(`[data-socketId='${socketIdToRemove}']`); //``backtabs
-    $el.parentNode.removeChild($el);
-
-  });
 
 
 /*
@@ -126,8 +105,60 @@ const initSocket = () => {
 
   });
 */
+   //als je zelf joint
+  socket.on('join', client => {
+
+    let $el = html(userTpl(client));
+    $clientsList.appendChild($el);
+  });
+
+  //stel eigen id in als socketId
+  socket.on('id', id => {
+
+    socketId = id;
+  });
+
+  //als er iemand disconnect
+  socket.on('leave', socketIdToRemove => {
+
+    let $el = $(`[data-socketId='${socketIdToRemove}']`); //``backtabs
+    $el.parentNode.removeChild($el);
+
+  });
+
+  socket.on('gameInvite', senderid => {
+
+    socket.opponent = senderid;
+
+    startGame();
+
+
+  });
+
+
 };
 
+
+const matchPlayers = (e) => {
+  socket.emit('gameInvite', {
+    from: socketId,
+    to: e.currentTarget.parentNode.getAttribute('data-socketid')
+  });
+
+  socket.opponent = e.currentTarget.parentNode.getAttribute('data-socketid');
+
+  console.log(socket);
+  startGame();
+
+};
+
+const startGame = () => {
+
+  $clientsList.parentNode.removeChild($clientsList);
+
+  setupGame();
+
+};
 
 
 const setupGame = () => {

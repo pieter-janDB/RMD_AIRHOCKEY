@@ -43,7 +43,7 @@ module.exports.register = (server, options, next) => {
 
     newClient.socketId = socket.id;
 
-    newClient.nickname = 'user: ' + socket.id ;
+    newClient.nickname = 'user: ' + socket.id;
 
 
     clients.push(newClient);

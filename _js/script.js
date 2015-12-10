@@ -10,9 +10,9 @@
 let $canvas = document.querySelector('#canvas');
 import {Ball, Player} from './game/';
 
-import {$, html, prepend} from './helpers/util.js';
+import {$, html} from './helpers/util.js';
 import userTpl from '../_hbs/user';
-import Status from '../models/Status.js';
+//import Status from '../models/Status.js';
 
 
 let player = new Player();
@@ -25,7 +25,7 @@ let $clientsList = $('.clients');
 let $matchMakingKnop = $('.searchButton');
 let socketId;
 
-let ctx=document.querySelector('#canvas').getContext("2d");
+let ctx=document.querySelector('#canvas').getContext('2d');
 
 const init = () => {
 
@@ -56,13 +56,13 @@ const initSocket = () => {
 
         let $client = html(userTpl(client));
 
-        if(client.socketId != socketId){
+        if(client.socketId !== socketId){
 
           $client.querySelector('.connect').addEventListener('click', e => {
-
+            e.preventDefault();
             socket.emit('gameInvite', {
               from: socketId,
-              to: "test12345"
+              to: 'test12345'
             });
           });
 
@@ -140,7 +140,7 @@ const _onFrame = () => {
 
 
 
-  ctx.fillStyle = "blue";
+  ctx.fillStyle = 'blue';
 
   ctx.rect(0, 0, 320, 568);
   ctx.fill();

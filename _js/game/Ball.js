@@ -27,7 +27,7 @@ export default class Ball extends EventEmitter{
     this.fill = 'black';
     this.topSpeed = 0.1;
 
-    this.ctx=document.querySelector('#canvas').getContext("2d");
+    this.ctx=document.querySelector('#canvas').getContext('2d');
     this.location = new Victor(this.x, this.y);
     this.velocity = new Victor(this.xSpeed, this.ySpeed);
     this.acceleration = new Victor(0.01, 0.01);
@@ -53,11 +53,11 @@ export default class Ball extends EventEmitter{
     //this.velocity.mult(0.95);
 
 
-    this.ctx.fillStyle = "black";
+    this.ctx.fillStyle = 'black';
     this.ctx.beginPath();
-    this.ctx.arc(this.location.x,this.location.y,this.radius,0,2*Math.PI);
+    this.ctx.arc(this.location.x, this.location.y, this.radius, 0, 2*Math.PI);
 
-    this.ctx.fill()
+    this.ctx.fill();
 
 
   }

@@ -8,6 +8,7 @@ module.exports = {
   socketId: '',
   nickname: 'unknown player',
   opponent: '',
+  playerNumber: '',
   self: false,
   button: true
 };

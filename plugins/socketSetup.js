@@ -2,48 +2,18 @@
 module.exports.register = (server, options, next) => {
 
   let io = require('socket.io')(server.listener);
-  let Status = require('../models/Status');
   let Client = require('../models/Client');
   let clients = [];
-
-  const search = (you, socket) => {
-
-    if(you === undefined || you.status !== Status.searching) return;
-
-    let list = clients.filter(
-      c => c.socketId !== you.socketId && c.status === Status.searching
-    );
-
-    if(list.length === 0){
-      setTimeout(search, 2000, you, socket);
-    }else{
-
-      let stranger = list[Math.round(Math.random() * (list.length-1))];
-
-      you.status = Status.paired;
-      stranger.status = Status.paired;
-
-      io.emit('update_status', you);
-      io.emit('update_status', stranger);
-
-      //stuur naar laatste found en wie het is
-      //socket.emit('found', stranger);
-      let roomId = Math.round(Math.random()*100*Math.random() *255);
-      console.log(roomId);
-      io.to(stranger.socketId).emit('found', you, roomId);
-      io.to(you.socketId).emit('found', stranger, roomId);
-      //stuur naar degene die al in queue zat?
-
-    }
-
-  };
+  let maxId = 1;
 
   io.on('connection', socket => {
+
+
     let newClient = Object.assign({}, Client);
 
     newClient.socketId = socket.id;
 
-    newClient.nickname = 'user: ' + socket.id;
+    newClient.nickname = 'user: ' + maxId;
 
 
     clients.push(newClient);
@@ -57,30 +27,20 @@ module.exports.register = (server, options, next) => {
       socket.broadcast.emit('leave', socket.id);
     });
 
-    //set status
-    /*
-    socket.on('status', status =>{
+    socket.on('leaveList', socketIdToRemove => {
 
-      if(newClient.status === status) return;
-      newClient.status = status;
-      if(newClient.status === Status.searching){
+      clients = clients.filter(
+        c => c.socketId !== socketIdToRemove
+      );
 
-        search(newClient, socket);
-      }
-
-      io.emit('update_status', newClient);
+      socket.broadcast.emit('leave', socketIdToRemove);
     });
 
-    */
 
     socket.on('gameInvite', data => {
-
-      console.log('gameInvite' + data);
-
+      io.to(data.to).emit('gameInvite', data.from);
 
     });
-
-    socket.on('gameInvite', data => io.to(data.to).emit('gameInvite', data.from));
 
     socket.emit('id', socket.id);
 
@@ -90,7 +50,36 @@ module.exports.register = (server, options, next) => {
 
     socket.emit('init', clients); // doorsturen en in script opvangen
     socket.broadcast.emit('join', newClient);
+
+
+
+
+    socket.on('requestStatus', data => {
+      io.to(data.to).emit('requestStatus', data.from);
+
+
+
+    });
+
+    socket.on('sendStatus', data => {
+      io.to(data.to).emit('sendStatus', data.status);
+
+    });
+
+    socket.on('startGame', opponent => {
+      console.log(opponent);
+      io.to(opponent).emit('readyToStart');
+
+    });
+
+    maxId++;
   });
+
+
+  //GAMELOGICA
+
+
+
 
 
 

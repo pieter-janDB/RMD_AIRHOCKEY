@@ -14,13 +14,13 @@ let Victor = require('victor');
 export default class Ball extends EventEmitter{
 
 
-  constructor(){
+  constructor(x, y){
 
     super(); //roept super van eventemitter op anders zal het niet werken
 
 
-    this.x = 160.0;
-    this.y = 425.0;
+    this.x = x;
+    this.y = y;
     this.xSpeed = 0;
     this.ySpeed = 0;
     this.radius = 15;
@@ -30,7 +30,7 @@ export default class Ball extends EventEmitter{
     this.ctx=document.querySelector('#canvas').getContext('2d');
     this.location = new Victor(this.x, this.y);
     this.velocity = new Victor(this.xSpeed, this.ySpeed);
-    this.acceleration = new Victor(0.01, 0.01);
+    this.acceleration = new Victor(0, 0);
 
 
 

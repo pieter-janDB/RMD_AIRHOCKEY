@@ -29,24 +29,16 @@ export default class Player extends EventEmitter{
     this.fill = 'red';
     this.topSpeed = 100;
     this.ctx = $canvas.getContext('2d');
+    this.playFieldWidth = 320;
+    this.playFieldHeight = 568;
 
 
     this.location = new Victor(this.x, this.y);
-    this.velocity = new Victor(this.xSpeed, this.ySpeed);
-    this.acceleration = new Victor(0, 0);
+    this.easing = new Victor(0.4, 0.4);
     this.mousepos = new Victor(this.x, this.y);
+    //this.acceleration = new Victor(0, 0);
 
-    //this.position = new Vector(position.x, position.y);
-
-    //this.velocity = new Vector(0, 0);
-
-   //$canvas.addEventListener('touchstart', this.touchStart, false);
-   //$canvas.addEventListener('touchmove', this.setMousePosition.bind(this), false);
-
-   //$canvas.addEventListener('mousedown', this.startDrag, false);
-   //$canvas.addEventListener('mouseup', this.stopDrag, false);
-   //$canvas.addEventListener('mousemove', this.setMousePosition.bind(this), false);
-
+    this.velocity = new Victor(this.xSpeed, this.ySpeed);
 
     $canvas.addEventListener('touchstart', this.testStart.bind(this), false);
     $canvas.addEventListener('touchmove', this.testMove.bind(this), false);
@@ -101,44 +93,55 @@ export default class Player extends EventEmitter{
     //console.log(this.mousepos);
 
 
-    //this.dir = this.mouse.clone();
+
     //this.dir.substract(this.location);
+
+
+    this.velocity = this.mousepos.clone().subtract(this.location).multiply(this.easing);
+    this.location = this.location.add(this.velocity);
+
+    //zie dat player in scherm blijft
+    if(this.location.x < this.radius) this.location.x = this.radius;
+    if(this.location.x > this.playFieldWidth - this.radius) this.location.x = this.playFieldWidth - this.radius;
+    if(this.location.y < this.radius) this.location.y = this.radius;
+    if(this.location.y > this.playFieldHeight - this.radius) this.location.y = this.playFieldHeight - this.radius;
+
 
     //this.dir.normalize();
     //this.dir.multiply(0.5, 0,5);
     //this.acceleration = this.dir;
-
-    this.velocity.add(this.acceleration);
-    this.velocity.limit(this.topSpeed, 1);
-    this.location.add(this.velocity);
+    //this.acceleration = dir;
+    //this.velocity.add(this.acceleration);
+    //this.velocity.limit(this.topSpeed, 0.99);
+    //this.location.add(this.velocity);
 
     //console.log(this.location.toString());
 
-    this.checkEdges();
+    //this.checkEdges();
 
 
     //this.velocity.add(this.acceleration);
-    //this.position.add(this.velocity);
+    //this.location.add(this.velocity);
 
     //this.acceleration.mult(0);
     //this.velocity.mult(0.95);
     this.ctx.fillStyle = 'yellow';
     this.ctx.beginPath();
-    this.ctx.arc(this.mousepos.x, this.mousepos.y, this.radius, 0, 2*Math.PI);
+    this.ctx.arc(this.location.x, this.location.y, this.radius, 0, 2*Math.PI);
 
     this.ctx.fill();
 
   }
 
   checkEdges(){
-    if ((this.location.x >= 320-this.radius) || (this.location.x <= this.radius)) {
+    if ((this.location.x >= this.playFieldWidth-this.radius) || (this.location.x <= this.radius)) {
 
       this.velocity.x = this.velocity.x * -1;
       this.acceleration.x = this.acceleration.x * -1;
 
       console.log('botsX');
     }
-    if ((this.location.y >= 568 - this.radius) || (this.location.y <= this.radius)) {
+    if ((this.location.y >= this.playFieldHeight - this.radius) || (this.location.y <= this.radius)) {
       this.velocity.y = this.velocity.y * -1;
       this.acceleration.y = this.acceleration.y * -1;
       console.log('botsY');
@@ -146,28 +149,7 @@ export default class Player extends EventEmitter{
 
   }
 
-  startDrag(e){
 
-    e.preventDefault();
-    console.log('down');
-
-  }
-  stopDrag(e){
-    e.preventDefault();
-    console.log('up');
-
-  }
-
-  setMousePosition(e){
-    e.preventDefault();
-    console.log(e);
-
-    this.mousepos.x = e.clientX-e.target.offsetLeft;
-    this.mousepos.y = e.clientY-e.target.offsetTop;
-    console.log(this.mousepos);
-
-
-  }
 
 }
 

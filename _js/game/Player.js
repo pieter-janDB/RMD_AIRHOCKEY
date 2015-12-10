@@ -125,7 +125,7 @@ export default class Player extends EventEmitter{
 
     //this.acceleration.mult(0);
     //this.velocity.mult(0.95);
-    this.ctx.fillStyle = 'yellow';
+    this.ctx.fillStyle = '#00B3CC';
     this.ctx.beginPath();
     this.ctx.arc(this.location.x, this.location.y, this.radius, 0, 2*Math.PI);
 

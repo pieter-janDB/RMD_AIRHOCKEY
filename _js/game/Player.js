@@ -31,6 +31,7 @@ export default class Player extends EventEmitter{
     this.ctx = $canvas.getContext('2d');
     this.playFieldWidth = 320;
     this.playFieldHeight = 568;
+    this.mass = 500;
 
 
     this.location = new Victor(this.x, this.y);
@@ -47,7 +48,6 @@ export default class Player extends EventEmitter{
 
 
   testStart(e) {
-    console.log('test');
     this.getTouchPos();
 
     //drawDot(ctx,touchX,touchY,12);
@@ -57,7 +57,6 @@ export default class Player extends EventEmitter{
   }
 
   testMove(e) {
-    console.log('moving');
     // Update the touch co-ordinates
     this.getTouchPos(e);
 
@@ -70,9 +69,6 @@ export default class Player extends EventEmitter{
 
   getTouchPos(e) {
 
-    console.log('test');
-
-    console.log(e);
     if (!e){
       var e = event;
     }

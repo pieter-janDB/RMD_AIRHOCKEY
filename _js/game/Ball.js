@@ -25,12 +25,15 @@ export default class Ball extends EventEmitter{
     this.ySpeed = 0;
     this.radius = 15;
     this.fill = 'black';
-    this.topSpeed = 0.1;
+    //this.topSpeed = 20;
+    this.mass = 300;
 
     this.ctx=document.querySelector('#canvas').getContext('2d');
     this.location = new Victor(this.x, this.y);
     this.velocity = new Victor(this.xSpeed, this.ySpeed);
     this.acceleration = new Victor(0, 0);
+
+    this.friction = new Victor(0.99, 0.99);
 
 
 
@@ -40,7 +43,7 @@ export default class Ball extends EventEmitter{
 
 
     this.velocity.add(this.acceleration);
-    this.velocity.limit(this.topSpeed, 1);
+    //this.velocity.limit(this.topSpeed, 0.9);
     this.location.add(this.velocity);
 
     this.checkEdges();
@@ -59,6 +62,7 @@ export default class Ball extends EventEmitter{
 
     this.ctx.fill();
 
+    this.velocity.multiply(this.friction);
 
   }
 
@@ -67,22 +71,34 @@ export default class Ball extends EventEmitter{
       this.velocity.x = this.velocity.x * -1;
       this.acceleration.x = this.acceleration.x * -1;
 
+      if(this.location.x > 320-this.radius) this.location.x = 320-this.radius;
+      if(this.location.x < this.radius) this.location.x = this.radius;
+
       console.log('botsX');
     }
     if (this.location.y >= 568 - this.radius) {
       this.velocity.y = this.velocity.y * -1;
       this.acceleration.y = this.acceleration.y * -1;
       console.log('botsY');
+
+      this.location.y = 568-this.radius;
     }else if (this.location.y <= this.radius){
 
       console.log('next screen');
       if(this.location.y <= -this.radius){
         console.log('out of bounds');
+
+
+        //testmode
+        this.velocity.y = this.velocity.y * -1;
+        this.acceleration.y = this.acceleration.y * -1;
+        this.location.y = this.radius;
       }
 
     }
 
   }
+
 
 
 }

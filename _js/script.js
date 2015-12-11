@@ -264,18 +264,75 @@ const _onFrame = () => {
   //console.log(player.location);
   //console.log(ball.location);
 
-
-
-  if(ballOnScreen){
+  checkCollision();
+ if(ballOnScreen){
     ball.update();
   }
-
-
   requestAnimationFrame(() => _onFrame()); //lus om te blijven uitvoeren voor animatie
 
 };
 
 
+const checkCollision = () => {
+  //check collision
+
+  let distance = Math.sqrt(((player.location.x - ball.location.x) * (player.location.x - ball.location.x)) + ((player.location.y - ball.location.y) * (player.location.y - ball.location.y)));
+  if (distance <= player.radius + ball.radius){
+
+    //if collision:
+
+    /*
+    let newVelX = (ball.velocity.x * (ball.radius - player.radius) + (2 * player.radius * player.velocity.x)) / (player.radius + ball.radius);
+    let newVelY = (ball.velocity.y * (ball.radius - player.radius) + (2 * player.radius * player.velocity.y)) / (player.radius + ball.radius);
+    ball.velocity.x = newVelX;
+    ball.velocity.y = newVelY;
+  */
+    manageBounce();
+
+    fixOverlapping();
+  }
+
+
+};
+
+const fixOverlapping = () => {
+
+  let midpointx = (player.location.x + ball.location.x) / 2;
+  let midpointy = (player.location.y + ball.location.y) / 2;
+
+  let dist = Math.sqrt(Math.pow(ball.location.x - player.location.x, 2) + Math.pow(ball.location.y - player.location.y, 2));
+  console.log(dist);
+  console.log(midpointx);
+
+  //player.location.x = midpointx + player.radius * (player.location.x - ball.location.x) / dist;
+  //player.location.y = midpointy + player.radius * (player.location.y - ball.location.y) / dist;
+  ball.location.x = midpointx + (ball.radius*2 - 2) * (ball.location.x - player.location.x) / dist;
+  ball.location.y = midpointy + (ball.radius*2 - 2) * (ball.location.y - player.location.y) / dist;
+
+  console.log(ball.location.x);
+};
+
+const manageBounce = () => {
+  let dx = player.location.x-ball.location.x;
+  let dy = player.location.y-ball.location.y;
+  let collisionisionAngle = Math.atan2(dy, dx);
+  let magnitude1 = Math.sqrt(player.velocity.x*player.velocity.x+player.velocity.y*player.velocity.y);
+  let magnitude2 = Math.sqrt(ball.velocity.x*ball.velocity.x+ball.velocity.y*ball.velocity.y);
+  let direction1 = Math.atan2(player.velocity.y, player.velocity.x);
+  let direction2 = Math.atan2(ball.velocity.y, ball.velocity.x);
+  let newVelocityX1 = magnitude1*Math.cos(direction1-collisionisionAngle);
+  //let newVelocityY1 = magnitude1*Math.sin(direction1-collisionisionAngle);
+  let newVelocityX2 = magnitude2*Math.cos(direction2-collisionisionAngle);
+  let newVelocityY2 = magnitude2*Math.sin(direction2-collisionisionAngle);
+  //let finalVelocityX1 = ((player.mass-ball.mass)*newVelocityX1+(ball.mass+ball.mass)*newVelocityX2)/(player.mass+ball.mass);
+  let finalVelocityX2 = ((player.mass+player.mass)*newVelocityX1+(ball.mass-player.mass)*newVelocityX2)/(player.mass+ball.mass);
+  //let finalVelocityY1 = newVelocityY1;
+  let finalVelocityY2 = newVelocityY2;
+  //player.velocity.x = Math.cos(collisionisionAngle)*finalVelocityX1+Math.cos(collisionisionAngle+Math.PI/2)*finalVelocityY1;
+  //player.velocity.y = Math.sin(collisionisionAngle)*finalVelocityX1+Math.sin(collisionisionAngle+Math.PI/2)*finalVelocityY1;
+  ball.velocity.x = Math.cos(collisionisionAngle)*finalVelocityX2+Math.cos(collisionisionAngle+Math.PI/2)*finalVelocityY2;
+  ball.velocity.y = Math.sin(collisionisionAngle)*finalVelocityX2+Math.sin(collisionisionAngle+Math.PI/2)*finalVelocityY2;
+};
 
 
 

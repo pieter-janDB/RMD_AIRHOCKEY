@@ -169,7 +169,7 @@ const hideList = () => {
 
 const showStartScreen = () => {
 
-  ctx.fillStyle = 'blue';
+  ctx.fillStyle = '#E4EEF9';
   ctx.rect(0, 0, 320, 568);
   ctx.fill();
 
@@ -202,7 +202,7 @@ const setReady = e => {
   e.preventDefault();
 
   if(e.touches['0'].clientX > boxX && e.touches['0'].clientX < boxX + boxWidth && e.touches['0'].clientY > boxY && e.touches['0'].clientY < boxY + boxHeight){
-    ctx.fillStyle = 'blue';
+    ctx.fillStyle = '#E4EEF9';
     ctx.rect(0, 0, 320, 568);
     ctx.fill();
 
@@ -252,7 +252,7 @@ const _onFrame = () => {
 
 
   //draw background
-  ctx.fillStyle = 'blue';
+  ctx.fillStyle = '#E4EEF9';
   ctx.rect(0, 0, 320, 568);
   ctx.fill();
 

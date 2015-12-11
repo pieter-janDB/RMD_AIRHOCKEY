@@ -14,11 +14,11 @@ let Victor = require('victor');
 export default class Ball extends EventEmitter{
 
 
-  constructor(x, y){
+  constructor(x, y, active, socket){
 
     super(); //roept super van eventemitter op anders zal het niet werken
 
-
+    this.socket = socket;
     this.x = x;
     this.y = y;
     this.xSpeed = 0;
@@ -27,6 +27,8 @@ export default class Ball extends EventEmitter{
     this.fill = 'black';
     //this.topSpeed = 20;
     this.mass = 300;
+
+    this.active = active;
 
     this.ctx=document.querySelector('#canvas').getContext('2d');
     this.location = new Victor(this.x, this.y);
@@ -65,9 +67,23 @@ export default class Ball extends EventEmitter{
     this.velocity.multiply(this.friction);
 
   }
+  setVelocity(x, y){
+
+    this.velocity.x = x;
+    this.velocity.y = y;
+  }
+
+  setAcceleration(x, y){
+
+    this.acceleration.x = x;
+    this.acceleration.y = y;
+  }
 
   checkEdges(){
+
+
     if ((this.location.x >= 320-this.radius) || (this.location.x <= this.radius)) {
+
       this.velocity.x = this.velocity.x * -1;
       this.acceleration.x = this.acceleration.x * -1;
 
@@ -76,26 +92,57 @@ export default class Ball extends EventEmitter{
 
       console.log('botsX');
     }
-    if (this.location.y >= 568 - this.radius) {
-      this.velocity.y = this.velocity.y * -1;
-      this.acceleration.y = this.acceleration.y * -1;
-      console.log('botsY');
-
-      this.location.y = 568-this.radius;
-    }else if (this.location.y <= this.radius){
-
-      console.log('next screen');
-      if(this.location.y <= -this.radius){
-        console.log('out of bounds');
 
 
-        //testmode
+    if (this.location.y >= 492 - this.radius) {
+
+      if(this.location.x > 80 && this.location.x < 320-80){
+
+        if(this.active){
+          if(this.location.y >= 495) {
+            console.log('goal');
+            this.socket.emit('goal', this.socket.id, this.socket.opponent);
+            this.active = false;
+          }
+        }
+
+
+      }else{
         this.velocity.y = this.velocity.y * -1;
         this.acceleration.y = this.acceleration.y * -1;
-        this.location.y = this.radius;
+        console.log('botsY');
+        this.location.y = 492-this.radius;
       }
 
+
+
+
+    }else if (this.location.y <= this.radius & this.velocity.y < 0){
+      if(this.active){
+
+        let data = {
+          location: this.location,
+          velocity: this.velocity,
+          acceleration: this.acceleration,
+          from: this.socket.id,
+          to: this.socket.opponent
+        };
+        this.socket.emit('passBall', data);
+
+        this.active = false;
+      }else{
+        if (this.location.y <= -this.radius & this.velocity.y < 0){
+          this.socket.emit('hideBall', this.socket.id);
+        }
+
+
+      }
+
+
+
+
     }
+
 
   }
 

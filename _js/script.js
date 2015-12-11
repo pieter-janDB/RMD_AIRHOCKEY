@@ -21,6 +21,10 @@ let socket;
 let $clientsList = $('.clients');
 let socketId;
 let ballOnScreen;
+let ownScore = 0;
+let strangerScore = 0;
+let scoreScreenImg, scoreScreenReadyImg;
+let startsWithBall = false;
 
 let $canvas = document.querySelector('#canvas');
 let ctx = $canvas.getContext('2d');
@@ -37,7 +41,9 @@ const init = () => {
 };
 
 const initSocket = () => {
-  socket = io('http://localhost:3000');
+
+  //socket = io.connect('http://localhost:3000');
+  socket = io();
 
   socket.on('init', clients => {
 
@@ -84,11 +90,18 @@ const initSocket = () => {
     }
   });
 
-   //als je zelf joint
+   //als er iem joint
   socket.on('join', client => {
 
     let $el = html(userTpl(client));
     $el.setAttribute('class', 'other');
+    $el.querySelector('.connect').addEventListener('click', e => {
+      e.preventDefault();
+
+      matchPlayers(e);
+
+    });
+
     $clientsList.appendChild($el);
   });
 
@@ -133,14 +146,36 @@ const initSocket = () => {
 
     if(socket.status === status){
       socket.emit('startGame', socket.opponent);
+      socket.status = Status.playing;
       setupGame();
 
     }
   });
   // iedereen is rdy
   socket.on('readyToStart', () => {
-
+    socket.status = Status.playing;
     setupGame();
+  });
+
+  socket.on('sendingBallData', data => {
+    spawnBall(data);
+  });
+
+  socket.on('hideBall', () => {
+    ballOnScreen = false;
+  });
+
+  socket.on('tegengoal', () => {
+    strangerScore++;
+    socket.status = Status.scoreScreen;
+    startsWithBall = true;
+  });
+
+  socket.on('gescoord', () => {
+    console.log('joepie goal');
+    ownScore++;
+    socket.status = Status.scoreScreen;
+    startsWithBall = false;
   });
 
 
@@ -155,6 +190,7 @@ const matchPlayers = (e) => {
 
   socket.opponent = e.currentTarget.parentNode.getAttribute('data-socketid');
   socket.playerNumber = 1;
+  startsWithBall = true;
   socket.status = Status.paired;
   hideList();
 
@@ -179,46 +215,52 @@ const showStartScreen = () => {
   ctx.fillText(socket.playerNumber, 130, 200);
 
   let boxX = 60;
-  let boxY = 400;
+  let boxY = 270;
   let boxWidth = 200;
-  let boxHeight = 100;
+  let boxHeight = 80;
 
   ctx.rect(boxX, boxY, boxWidth, boxHeight);
   ctx.stroke();
 
   ctx.font='50px Georgia';
-  ctx.fillText('ready', 100, 480);
+  ctx.fillText('ready', 100, boxY + boxHeight - 30);
 
   $canvas.addEventListener('touchstart', setReady, false);
-console.log('test');
+
 };
 
 const setReady = e => {
 
 
   let boxX = 60;
-  let boxY = 400;
+  let boxY = 270;
   let boxWidth = 200;
-  let boxHeight = 100;
+  let boxHeight = 80;
 
   e.preventDefault();
 
   if(e.touches['0'].clientX > boxX && e.touches['0'].clientX < boxX + boxWidth && e.touches['0'].clientY > boxY && e.touches['0'].clientY < boxY + boxHeight){
-    ctx.fillStyle = '#E4EEF9';
-    ctx.rect(0, 0, 320, 568);
-    ctx.fill();
+    if(socket.status === Status.paired){
+      ctx.fillStyle = '#E4EEF9';
+      ctx.rect(0, 0, 320, 568);
+      ctx.fill();
 
-    ctx.fillStyle = 'green';
-    ctx.font='120px Georgia';
-    ctx.fillText(socket.playerNumber, 130, 200);
+      ctx.fillStyle = 'green';
+      ctx.font='120px Georgia';
+      ctx.fillText(socket.playerNumber, 130, 200);
 
 
-    ctx.rect(60, 400, 200, 100);
-    ctx.stroke();
+      ctx.rect(boxX, boxY, boxWidth, boxHeight);
+      ctx.stroke();
 
-    ctx.font='50px Georgia';
-    ctx.fillText('ready', 100, 480);
-    socket.status = Status.ready;
+      ctx.font='50px Georgia';
+      ctx.fillText('ready', 100, boxY + boxHeight - 30);
+      socket.status = Status.ready;
+    }else if(socket.status === Status.scoreScreenImg){
+      socket.status = Status.ready;
+
+    }
+
 
     socket.emit('requestStatus', {
       from: socketId,
@@ -232,17 +274,22 @@ const setupGame = () => {
 
   $canvas.removeEventListener('touchstart', setReady, false);
 
-  //load graphics
+    //load graphics
+  scoreScreenImg = new Image();   // Create new img element
+  scoreScreenReadyImg = new Image();
+
+  scoreScreenReadyImg.src = './data/scoreRdy.png';
+  scoreScreenImg.src = './data/scoreNotRdy.png';
 
   //if ready => start Game loop
-  //gebeurd in socket.on('sendStatus'...
+  //gebeurd in socket.on('sendStatus'... (als alle2 ready zijn)
 
   player = new Player();
-  if(socket.playerNumber === 1){
-    ball = new Ball(160.0, 425.0);
+  if(startsWithBall){
+    ball = new Ball(160.0, 350.0, true, socket);
     ballOnScreen = true;
   }else{
-    ball = new Ball(-40, -40);
+    ball = new Ball(0, 0, false, socket);
     ballOnScreen = false;
   }
   _onFrame();
@@ -252,43 +299,73 @@ const setupGame = () => {
 
 const _onFrame = () => {
 
+  if(socket.status === Status.playing){
+    //draw background
+    ctx.fillStyle = '#E4EEF9';
+    ctx.rect(0, 0, 320, 568);
+    ctx.fill();
 
-  //draw background
-  ctx.fillStyle = '#E4EEF9';
-  ctx.rect(0, 0, 320, 568);
-  ctx.fill();
+    //draw goal
+
+    ctx.fillStyle = '#00B3CC';
+    player.update();
+
+    checkCollision();
+    if(ballOnScreen){
+      ball.update();
+    }
+  }else{
 
 
-  player.update();
 
 
 
-  //console.log(player.location);
-  //console.log(ball.location);
+  // execute drawImage statements here
+    if(socket.status === Status.scoreScreen){
+      ctx.drawImage(scoreScreenImg, 0, 0);
+      $canvas.addEventListener('touchstart', setReady, false);
+    }else{
+      ctx.drawImage(scoreScreenReadyImg, 0, 0);
+    }
 
-  checkCollision();
- if(ballOnScreen){
-    ball.update();
+
+    ctx.fillStyle = 'red';
+    ctx.font='60px Georgia';
+    ctx.fillText(ownScore, 100, 150);
+
+
+    ctx.font='60px Georgia';
+    ctx.fillText(strangerScore, 210, 150);
+
+
+
   }
+
+
+
+
+
+
+
   requestAnimationFrame(() => _onFrame()); //lus om te blijven uitvoeren voor animatie
 
 };
 
+const spawnBall = data => {
+  ballOnScreen = true;
+
+  ball = new Ball(320 - data.location.x, data.location.y - ball.radius*2, true, socket);
+
+  ball.setVelocity(data.velocity.x, -data.velocity.y);
+  ball.setAcceleration(data.acceleration.x, -data.acceleration.y);
+};
 
 const checkCollision = () => {
-  //check collision
+  //check collision if true bereken de bounce
 
   let distance = Math.sqrt(((player.location.x - ball.location.x) * (player.location.x - ball.location.x)) + ((player.location.y - ball.location.y) * (player.location.y - ball.location.y)));
   if (distance <= player.radius + ball.radius){
 
-    //if collision:
-
-    /*
-    let newVelX = (ball.velocity.x * (ball.radius - player.radius) + (2 * player.radius * player.velocity.x)) / (player.radius + ball.radius);
-    let newVelY = (ball.velocity.y * (ball.radius - player.radius) + (2 * player.radius * player.velocity.y)) / (player.radius + ball.radius);
-    ball.velocity.x = newVelX;
-    ball.velocity.y = newVelY;
-  */
     manageBounce();
 
     fixOverlapping();
@@ -303,15 +380,10 @@ const fixOverlapping = () => {
   let midpointy = (player.location.y + ball.location.y) / 2;
 
   let dist = Math.sqrt(Math.pow(ball.location.x - player.location.x, 2) + Math.pow(ball.location.y - player.location.y, 2));
-  console.log(dist);
-  console.log(midpointx);
 
-  //player.location.x = midpointx + player.radius * (player.location.x - ball.location.x) / dist;
-  //player.location.y = midpointy + player.radius * (player.location.y - ball.location.y) / dist;
-  ball.location.x = midpointx + (ball.radius*2 - 2) * (ball.location.x - player.location.x) / dist;
-  ball.location.y = midpointy + (ball.radius*2 - 2) * (ball.location.y - player.location.y) / dist;
+  ball.location.x = midpointx + (player.radius ) * (ball.location.x - player.location.x) / dist;
+  ball.location.y = midpointy + (player.radius ) * (ball.location.y - player.location.y) / dist;
 
-  console.log(ball.location.x);
 };
 
 const manageBounce = () => {

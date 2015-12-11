@@ -72,6 +72,24 @@ module.exports.register = (server, options, next) => {
 
     });
 
+    socket.on('passBall', data => {
+      console.log('passing ball');
+      io.to(data.to).emit('sendingBallData', data);
+
+
+    });
+
+    socket.on('hideBall', playerId => {
+      io.to(playerId).emit('hideBall');
+
+    });
+
+    socket.on('goal', (playerId, opponentId) => {
+      io.to(playerId).emit('tegengoal');
+      io.to(opponentId).emit('gescoord');
+
+    });
+
     maxId++;
   });
 

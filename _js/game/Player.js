@@ -30,7 +30,7 @@ export default class Player extends EventEmitter{
     this.topSpeed = 100;
     this.ctx = $canvas.getContext('2d');
     this.playFieldWidth = 320;
-    this.playFieldHeight = 568;
+    this.playFieldHeight = 492;
     this.mass = 500;
 
 
@@ -129,21 +129,6 @@ export default class Player extends EventEmitter{
 
   }
 
-  checkEdges(){
-    if ((this.location.x >= this.playFieldWidth-this.radius) || (this.location.x <= this.radius)) {
-
-      this.velocity.x = this.velocity.x * -1;
-      this.acceleration.x = this.acceleration.x * -1;
-
-      console.log('botsX');
-    }
-    if ((this.location.y >= this.playFieldHeight - this.radius) || (this.location.y <= this.radius)) {
-      this.velocity.y = this.velocity.y * -1;
-      this.acceleration.y = this.acceleration.y * -1;
-      console.log('botsY');
-    }
-
-  }
 
 
 

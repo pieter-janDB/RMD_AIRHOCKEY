@@ -31,7 +31,7 @@ export default class Ball extends EventEmitter{
     this.ctx=document.querySelector('#canvas').getContext('2d');
     this.location = new Victor(this.x, this.y);
     this.velocity = new Victor(this.xSpeed, this.ySpeed);
-    this.acceleration = new Victor(0.01, 0.01);
+    this.acceleration = new Victor(0, 0);
 
     this.friction = new Victor(0.99, 0.99);
 

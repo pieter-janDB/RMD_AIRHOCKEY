@@ -88,6 +88,7 @@ const initSocket = () => {
   socket.on('join', client => {
 
     let $el = html(userTpl(client));
+    $el.setAttribute('class', 'other');
     $clientsList.appendChild($el);
   });
 
@@ -189,10 +190,11 @@ const showStartScreen = () => {
   ctx.fillText('ready', 100, 480);
 
   $canvas.addEventListener('touchstart', setReady, false);
-
+console.log('test');
 };
 
 const setReady = e => {
+
 
   let boxX = 60;
   let boxY = 400;

@@ -62,7 +62,7 @@ const initSocket = () => {
 
         if(client.socketId !== socketId){
 
-          $client.querySelector('.connect').addEventListener('click', e => {
+          $client.querySelector('.connect').addEventListener('touchstart', e => {
             e.preventDefault();
 
             matchPlayers(e);
@@ -286,7 +286,7 @@ const setupGame = () => {
 
   player = new Player();
   if(startsWithBall){
-    ball = new Ball(160.0, 350.0, true, socket);
+    ball = new Ball(160.0, 300.0, true, socket);
     ballOnScreen = true;
   }else{
     ball = new Ball(0, 0, false, socket);
@@ -310,9 +310,17 @@ const _onFrame = () => {
     ctx.fillStyle = '#00B3CC';
     player.update();
 
-    checkCollision();
+
     if(ballOnScreen){
-      ball.update();
+      if(checkCollision()){
+
+fixOverlapping();
+
+      }
+       ball.update();
+      if(checkCollision()){
+        manageBounce();
+      }
     }
   }else{
 
@@ -356,19 +364,19 @@ const spawnBall = data => {
 
   ball = new Ball(320 - data.location.x, data.location.y - ball.radius*2, true, socket);
 
-  ball.setVelocity(data.velocity.x, -data.velocity.y);
-  ball.setAcceleration(data.acceleration.x, -data.acceleration.y);
+  ball.setVelocity(-data.velocity.x, -data.velocity.y);
+  ball.setAcceleration(-data.acceleration.x, -data.acceleration.y);
 };
 
 const checkCollision = () => {
   //check collision if true bereken de bounce
 
-  let distance = Math.sqrt(((player.location.x - ball.location.x) * (player.location.x - ball.location.x)) + ((player.location.y - ball.location.y) * (player.location.y - ball.location.y)));
+  let distance = Math.sqrt(Math.pow(ball.location.x - player.location.x, 2) + Math.pow(ball.location.y - player.location.y, 2));
   if (distance <= player.radius + ball.radius){
+    return true;
 
-    manageBounce();
-
-    fixOverlapping();
+  }else{
+    return false;
   }
 
 
@@ -381,8 +389,8 @@ const fixOverlapping = () => {
 
   let dist = Math.sqrt(Math.pow(ball.location.x - player.location.x, 2) + Math.pow(ball.location.y - player.location.y, 2));
 
-  ball.location.x = midpointx + (player.radius ) * (ball.location.x - player.location.x) / dist;
-  ball.location.y = midpointy + (player.radius ) * (ball.location.y - player.location.y) / dist;
+  ball.location.x = midpointx + ((player.radius +ball.radius )/2) * (ball.location.x - player.location.x) / dist;
+  ball.location.y = midpointy + ((player.radius +ball.radius )/2) * (ball.location.y - player.location.y) / dist;
 
 };
 

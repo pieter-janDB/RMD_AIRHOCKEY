@@ -22,7 +22,7 @@ export default class Player extends EventEmitter{
 
 
     this.x = 160.0;
-    this.y = 475.0;
+    this.y = 375.0;
     this.xSpeed = 0;
     this.ySpeed = 0;
     this.radius = 30;
@@ -35,7 +35,7 @@ export default class Player extends EventEmitter{
 
 
     this.location = new Victor(this.x, this.y);
-    this.easing = new Victor(0.4, 0.4);
+    this.easing = new Victor(0.3, 0.3);
     this.mousepos = new Victor(this.x, this.y);
     //this.acceleration = new Victor(0, 0);
 
@@ -75,8 +75,26 @@ export default class Player extends EventEmitter{
     if (e.touches) {
       if (e.touches.length === 1) { // Only deal with one finger
         var touch = e.touches[0]; // Get the information for finger #1
-        this.mousepos.x=touch.pageX-touch.target.offsetLeft;
-        this.mousepos.y=touch.pageY-touch.target.offsetTop;
+
+        //enkel als vinger < 100px van bal verwijderd is
+
+        if(touch.pageX-touch.target.offsetLeft >= this.mousepos.x -100 && touch.pageX-touch.target.offsetLeft <= this.mousepos.x +100 && touch.pageY-touch.target.offsetLeft >= this.mousepos.y -100 && touch.pageY-touch.target.offsetLeft <= this.mousepos.y +100){
+
+          this.mousepos.x=touch.pageX-touch.target.offsetLeft;
+          this.mousepos.y=touch.pageY-touch.target.offsetTop;
+
+
+
+        if(this.mousepos.x < this.radius) this.mousepos.x = this.radius;
+        if(this.mousepos.x > this.playFieldWidth - this.radius) this.mousepos.x = this.playFieldWidth - this.radius;
+        if(this.mousepos.y < this.radius) this.mousepos.y = this.radius;
+        if(this.mousepos.y > this.playFieldHeight - this.radius) this.mousepos.y = this.playFieldHeight - this.radius;
+
+
+
+
+        }
+
       }
     }
   }

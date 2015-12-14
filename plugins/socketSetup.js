@@ -44,20 +44,12 @@ module.exports.register = (server, options, next) => {
 
     socket.emit('id', socket.id);
 
-
-    //let client = new Client(maxID + 1, socket.id);
-
-
     socket.emit('init', clients); // doorsturen en in script opvangen
+
     socket.broadcast.emit('join', newClient);
-
-
-
 
     socket.on('requestStatus', data => {
       io.to(data.to).emit('requestStatus', data.from);
-
-
 
     });
 

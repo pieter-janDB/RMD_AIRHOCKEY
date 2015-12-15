@@ -5,9 +5,7 @@
 
 // import 'babel-core/polyfill';
 // or import specific polyfills
-// import {$} from './helpers/util';
-
-
+import {mapRange} from './helpers/util';
 import {Ball, Player} from './game/';
 
 import {$, html} from './helpers/util.js';
@@ -152,7 +150,6 @@ const resetPositionsAndTouch = () => {
 const _onFrame = () => {
   gameRunning = true;
 
-
   if(socket.status === Status.playing){
     //draw background
     ctx.fillStyle = '#E4EEF9';
@@ -161,7 +158,7 @@ const _onFrame = () => {
 
     ctx.fillStyle = '#00B3CC';
 
-    update2();
+    update3();
 
   }else{
 
@@ -195,8 +192,8 @@ const update1 = () => {
     }
     while(checkCollision()){
 
-      testOverlapping();
-      //testBounce();
+      extraBounce();
+
       //manageBounce();
       //
       ball.update();
@@ -215,7 +212,7 @@ const update2 = () => {
     if(checkCollision()){
 
       manageBounce();
-      testOverlapping();
+      extraBounce();
       fixOverlapping();
       player.update();
 
@@ -230,6 +227,32 @@ const update2 = () => {
   player.draw();
 
 };
+
+const update3 = () => {
+
+
+  if(ballOnScreen){
+    ball.update();
+
+    if(checkCollision()){
+      manageBounce();
+      extraBounce(20); // 1-20
+
+      while(checkCollision()){
+
+        if(ball.overTheEdge()){
+          stopPlayerUpdate();
+        }
+        newOverlapping();
+      }
+    }
+    ball.draw();
+  }
+  player.update();
+  player.draw();
+
+};
+
 
 
 
@@ -255,19 +278,18 @@ const checkCollision = () => {
 
 };
 
+const extraBounce = (amount) => {
 
-const testBounce = () => {
-
-  ball.velocity.x += ((ball.location.x - player.location.x)/(ball.radius+player.radius)+ player.velocity.x);
-  ball.velocity.y += ((ball.location.y - player.location.y)/(ball.radius+player.radius)+ player.velocity.y);
-
-};
-
-const testOverlapping = () => {
-  ball.velocity.x += ((ball.location.x - player.location.x)/(ball.radius+player.radius));
-  ball.velocity.y += ((ball.location.y - player.location.y)/(ball.radius+player.radius));
+  let fixedAmount = mapRange(amount, 1, 20, 20, 1);
+  console.log(fixedAmount);
+  console.log ('x+ = ' + ((ball.location.x - player.location.x)/(ball.radius+player.radius))/amount + 'y+ = ' + ((ball.location.y - player.location.y)/(ball.radius+player.radius))/amount);
+  ball.velocity.x += ((ball.location.x - player.location.x)/(ball.radius+player.radius))/amount;
+  ball.velocity.y += ((ball.location.y - player.location.y)/(ball.radius+player.radius))/amount;
 
 };
+
+
+
 
 const fixOverlapping = () => {
 
@@ -279,6 +301,18 @@ const fixOverlapping = () => {
   ball.location.y = midpointy + ((player.radius +ball.radius )/2) * (ball.location.y - player.location.y) / dist;
 
 };
+
+const newOverlapping = () => {
+
+  ball.location.x -= -ball.velocity.x/30;
+  ball.location.y -= -ball.velocity.y/30;
+};
+const stopPlayerUpdate = () => {
+
+  player.location.x -= -player.velocity.x/30;
+  player.location.y -= -player.velocity.y/30;
+};
+
 
 const manageBounce = () => {
 

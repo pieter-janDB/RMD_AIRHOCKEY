@@ -19,13 +19,13 @@ export default class Player extends EventEmitter{
   constructor(){
 
     super(); //roept super van eventemitter op anders zal het niet werken
-    this.radius = 45;
+    this.radius = 40;
     this.fill = 'red';
-    this.topSpeed = 15;
+    this.topSpeed = 18;
     this.ctx = $canvas.getContext('2d');
     this.playFieldWidth = 320;
     this.playFieldHeight = 492;
-    this.mass = 100;
+    this.mass = 75;
 
     this.location = new Victor(160.0, 375.0);
     this.easing = new Victor(1, 1);

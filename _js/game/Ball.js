@@ -10,20 +10,22 @@ export default class Ball extends EventEmitter{
 
   constructor(x, y, active, socket){
 
+    //topspeed laten meegeven selecteren in menu?
+
     super(); //roept super van eventemitter op anders zal het niet werken
     this.socket = socket;
     this.x = x;
     this.y = y;
     this.radius = 20;
     this.fill = 'black';
-    this.topSpeed = 15;
-    this.mass = 10;
+    this.topSpeed = 19;
+    this.mass = 38;
     this.active = active;
 
     this.ctx=document.querySelector('#canvas').getContext('2d');
     this.location = new Victor(this.x, this.y);
     this.velocity = new Victor(0, 0);
-    this.friction = new Victor(0.994, 0.994);
+    this.friction = new Victor(0.990, 0.990);
     this.oldVelocity = 0;
 
   }
@@ -137,8 +139,18 @@ export default class Ball extends EventEmitter{
     //zijkanten
     if ((this.location.x >= 320-this.radius) || (this.location.x <= this.radius)) {
       this.velocity.x = this.velocity.x * -1;
+      console.log('zijkant');
       if(this.location.x > 320-this.radius) this.location.x = 320-this.radius;
       if(this.location.x < this.radius) this.location.x = this.radius;
+    }
+  }
+
+   overTheEdge(){
+    //zijkanten
+    if ((this.location.x >= 320-this.radius) || (this.location.x <= this.radius) || this.location.y >= 492 - this.radius) {
+      return true;
+    }else{
+      return false;
     }
   }
 }

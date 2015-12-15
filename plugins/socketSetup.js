@@ -8,6 +8,8 @@ module.exports.register = (server, options, next) => {
 
   io.on('connection', socket => {
 
+    //Redirect op terug in game komen na gsm uit ?
+
 
     let newClient = Object.assign({}, Client);
 
@@ -59,10 +61,12 @@ module.exports.register = (server, options, next) => {
     });
 
     socket.on('startGame', opponent => {
-      console.log(opponent);
       io.to(opponent).emit('readyToStart');
 
     });
+
+
+    //GAMELOGICA
 
     socket.on('passBall', data => {
       console.log('passing ball');
@@ -85,8 +89,6 @@ module.exports.register = (server, options, next) => {
     maxId++;
   });
 
-
-  //GAMELOGICA
 
 
 

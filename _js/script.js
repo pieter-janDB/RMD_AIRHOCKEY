@@ -31,6 +31,8 @@ const init = () => {
     //SOCKET.IO
   initSocket();
 
+  //setupGame();
+
 };
 //#-#-#-#-#-#-#-#-#-#-#-#- pregame functions -#-#-#-#-#-#-#-#-#-#-#-#
 

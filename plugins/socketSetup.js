@@ -8,6 +8,8 @@ module.exports.register = (server, options, next) => {
 
   io.on('connection', socket => {
 
+    //Redirect op terug in game komen na gsm uit ?
+
 
     let newClient = Object.assign({}, Client);
 
@@ -44,20 +46,12 @@ module.exports.register = (server, options, next) => {
 
     socket.emit('id', socket.id);
 
-
-    //let client = new Client(maxID + 1, socket.id);
-
-
     socket.emit('init', clients); // doorsturen en in script opvangen
+
     socket.broadcast.emit('join', newClient);
-
-
-
 
     socket.on('requestStatus', data => {
       io.to(data.to).emit('requestStatus', data.from);
-
-
 
     });
 
@@ -67,16 +61,34 @@ module.exports.register = (server, options, next) => {
     });
 
     socket.on('startGame', opponent => {
-      console.log(opponent);
       io.to(opponent).emit('readyToStart');
+
+    });
+
+
+    //GAMELOGICA
+
+    socket.on('passBall', data => {
+      console.log('passing ball');
+      io.to(data.to).emit('sendingBallData', data);
+
+
+    });
+
+    socket.on('hideBall', playerId => {
+      io.to(playerId).emit('hideBall');
+
+    });
+
+    socket.on('goal', (playerId, opponentId) => {
+      io.to(playerId).emit('tegengoal');
+      io.to(opponentId).emit('gescoord');
 
     });
 
     maxId++;
   });
 
-
-  //GAMELOGICA
 
 
 

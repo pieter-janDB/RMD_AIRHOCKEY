@@ -19,51 +19,33 @@ export default class Player extends EventEmitter{
   constructor(){
 
     super(); //roept super van eventemitter op anders zal het niet werken
-
-
-    this.x = 160.0;
-    this.y = 475.0;
-    this.xSpeed = 0;
-    this.ySpeed = 0;
-    this.radius = 30;
+    this.radius = 40;
     this.fill = 'red';
-    this.topSpeed = 100;
+    this.topSpeed = 18;
     this.ctx = $canvas.getContext('2d');
     this.playFieldWidth = 320;
-    this.playFieldHeight = 568;
-    this.mass = 500;
+    this.playFieldHeight = 492;
+    this.mass = 75;
 
+    this.location = new Victor(160.0, 375.0);
+    this.easing = new Victor(1, 1);
+    this.mousepos = new Victor(160.0, 375.0);
+    this.velocity = new Victor(0, 0);
+    this.oldVelocity = 0;
 
-    this.location = new Victor(this.x, this.y);
-    this.easing = new Victor(0.4, 0.4);
-    this.mousepos = new Victor(this.x, this.y);
-    //this.acceleration = new Victor(0, 0);
-
-    this.velocity = new Victor(this.xSpeed, this.ySpeed);
-
-    $canvas.addEventListener('touchstart', this.testStart.bind(this), false);
-    $canvas.addEventListener('touchmove', this.testMove.bind(this), false);
+    $canvas.addEventListener('touchstart', this.touchStart.bind(this), false);
+    $canvas.addEventListener('touchmove', this.touchMov.bind(this), false);
 
   }
 
 
-  testStart(e) {
+  touchStart(e) {
     this.getTouchPos();
-
-    //drawDot(ctx,touchX,touchY,12);
-
-    // Prevents an additional mousedown event being triggered
     e.preventDefault();
   }
 
-  testMove(e) {
-    // Update the touch co-ordinates
+  touchMov(e) {
     this.getTouchPos(e);
-
-    // During a touchmove event, unlike a mousemove event, we don't need to check if the touch is engaged, since there will always be contact with the screen by definition.
-    //drawDot(ctx,touchX,touchY,12);
-
-    // Prevent a scrolling action as a result of this touchmove triggering.
     e.preventDefault();
   }
 
@@ -75,25 +57,24 @@ export default class Player extends EventEmitter{
     if (e.touches) {
       if (e.touches.length === 1) { // Only deal with one finger
         var touch = e.touches[0]; // Get the information for finger #1
-        this.mousepos.x=touch.pageX-touch.target.offsetLeft;
-        this.mousepos.y=touch.pageY-touch.target.offsetTop;
+        //enkel als vinger < 100px van bal verwijderd is
+        if(touch.pageX-touch.target.offsetLeft >= this.mousepos.x -100 && touch.pageX-touch.target.offsetLeft <= this.mousepos.x +100 && touch.pageY-touch.target.offsetLeft >= this.mousepos.y -100 && touch.pageY-touch.target.offsetLeft <= this.mousepos.y +100){
+
+          this.mousepos.x=touch.pageX-touch.target.offsetLeft;
+          this.mousepos.y=touch.pageY-touch.target.offsetTop;
+          if(this.mousepos.x < this.radius) this.mousepos.x = this.radius;
+          if(this.mousepos.x > this.playFieldWidth - this.radius) this.mousepos.x = this.playFieldWidth - this.radius;
+          if(this.mousepos.y < this.radius) this.mousepos.y = this.radius;
+          if(this.mousepos.y > this.playFieldHeight - this.radius) this.mousepos.y = this.playFieldHeight - this.radius;
+        }
       }
     }
   }
 
-
-
   update(){
 
-
-    //console.log(this.mousepos);
-
-
-
-    //this.dir.substract(this.location);
-
-
     this.velocity = this.mousepos.clone().subtract(this.location).multiply(this.easing);
+    this.limitSpeed(this.topSpeed);
     this.location = this.location.add(this.velocity);
 
     //zie dat player in scherm blijft
@@ -121,29 +102,64 @@ export default class Player extends EventEmitter{
 
     //this.acceleration.mult(0);
     //this.velocity.mult(0.95);
+
+
+  }
+
+  draw(){
+
     this.ctx.fillStyle = '#00B3CC';
     this.ctx.beginPath();
     this.ctx.arc(this.location.x, this.location.y, this.radius, 0, 2*Math.PI);
-
     this.ctx.fill();
+  }
+
+  limitSpeed(limit){
+
+
+
+    if(this.velocity.x > limit){
+      this.oldVelocity = this.velocity.x;
+      this.velocity.x = limit;
+      if(this.velocity.y < 0){
+        this.velocity.y = this.velocity.y / this.oldVelocity * limit;
+      }else{
+        this.velocity.y = this.velocity.y / this.oldVelocity * limit;
+      }
+
+    }else if(this.velocity.x < -limit){
+      this.oldVelocity = this.velocity.x;
+      this.velocity.x = -limit;
+      if(this.velocity.y < 0){
+        this.velocity.y = this.velocity.y / this.oldVelocity * -limit;
+      }else{
+        this.velocity.y = this.velocity.y / this.oldVelocity * -limit;
+      }
+
+    }
+    if(this.velocity.y > limit){
+      this.oldVelocity = this.velocity.y;
+      this.velocity.y = limit;
+      if(this.velocity.x < 0){
+        this.velocity.x = this.velocity.x / this.oldVelocity * limit;
+      }else{
+        this.velocity.x = this.velocity.x / this.oldVelocity * limit;
+      }
+
+    }else if(this.velocity.y < -limit){
+      this.oldVelocity = this.velocity.y;
+      this.velocity.y = -limit;
+      // velo x -10 en y -3 of 3
+      if(this.velocity.x < 0){
+        this.velocity.x = this.velocity.x / this.oldVelocity * -limit;
+      }else{
+        this.velocity.x = this.velocity.x / this.oldVelocity * -limit;
+      }
+
+    }
 
   }
 
-  checkEdges(){
-    if ((this.location.x >= this.playFieldWidth-this.radius) || (this.location.x <= this.radius)) {
-
-      this.velocity.x = this.velocity.x * -1;
-      this.acceleration.x = this.acceleration.x * -1;
-
-      console.log('botsX');
-    }
-    if ((this.location.y >= this.playFieldHeight - this.radius) || (this.location.y <= this.radius)) {
-      this.velocity.y = this.velocity.y * -1;
-      this.acceleration.y = this.acceleration.y * -1;
-      console.log('botsY');
-    }
-
-  }
 
 
 

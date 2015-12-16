@@ -22,6 +22,8 @@ let server = new Hapi.Server({
 
 server.connection({port: port});
 
+
+
 const pluginHandler = (err) => {
   if(err) console.error(err);
 };

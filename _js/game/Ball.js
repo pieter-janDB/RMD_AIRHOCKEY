@@ -3,6 +3,13 @@
 //import {MathUtil, SoundUtil} from '../util/';
 
 import EventEmitter from 'eventemitter2';
+import SoundUtil from '../modules/util/SoundUtil';
+// import {Player, BufferLoader} from '../modules/sound/';
+import Player from '../modules/sound/Player';
+import BufferLoader from '../modules/sound/BufferLoader';
+import sets from '../data/sets.js';
+
+let audioPlayer; //Player
 
 
 
@@ -75,6 +82,13 @@ export default class Ball extends EventEmitter{
       if(this.location.x < this.radius) this.location.x = this.radius;
 
       console.log('botsX');
+
+      // let loader = new BufferLoader(ctx);
+      // loader.load(sets[hitsounds].then( data =>
+
+      //   player.play(circle, circle.target); OF ZOIETS...
+
+      //   ))
     }
     if (this.location.y >= 568 - this.radius) {
       this.velocity.y = this.velocity.y * -1;

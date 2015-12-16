@@ -37,7 +37,9 @@ const init = () => {
 };
 
 const initSocket = () => {
-  socket = io('http://localhost:3000');
+  socket = io();
+  //socket = io('http://172.30.13.20:3000');
+  //socket = io('http://localhost:3000');
 
   socket.on('init', clients => {
 
@@ -190,7 +192,7 @@ const showStartScreen = () => {
   ctx.fillText('ready', 100, 480);
 
   $canvas.addEventListener('touchstart', setReady, false);
-console.log('test');
+  console.log('test');
 };
 
 const setReady = e => {
@@ -267,7 +269,7 @@ const _onFrame = () => {
   //console.log(ball.location);
 
   checkCollision();
- if(ballOnScreen){
+  if(ballOnScreen){
     ball.update();
   }
   requestAnimationFrame(() => _onFrame()); //lus om te blijven uitvoeren voor animatie

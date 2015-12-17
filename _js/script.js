@@ -79,9 +79,11 @@ const showStartScreen = () => {
   ctx.drawImage(backgroundAlign, 0, 0, 320, 492);
   ctx.drawImage(readyButtonDisabled, 52, 343, 216, 99);
 
-  ctx.fillStyle = 'red';
-  ctx.font='60px Georgia';
-  ctx.fillText('player ' + socket.playerNumber, 80, 220);
+  ctx.fillStyle = '#BC31AF';
+  ctx.font='90px BigNoodle';
+  ctx.fillText('player ' + socket.playerNumber, 50, 230);
+  ctx.font='33px BigNoodle';
+  ctx.fillText('Align your phones', 65, 155);
 
   $canvas.addEventListener('touchstart', setReady, false);
 };
@@ -98,8 +100,10 @@ const setReady = e => {
       ctx.drawImage(backgroundAlignReady, 0, 0, 320, 492);
 
       ctx.fillStyle = '#00B3CC';
-      ctx.font='60px Georgia';
-      ctx.fillText('player ' + socket.playerNumber, 80, 220);
+      ctx.font='90px BigNoodle';
+      ctx.fillText('player ' + socket.playerNumber, 50, 230);
+      ctx.font='33px BigNoodle';
+      ctx.fillText('Align your phones', 65, 155);
 
       ctx.drawImage(readyButtonEnabled, 52, 343, 216, 99);
 
@@ -191,6 +195,13 @@ const _onFrame = () => {
       ctx.fill();
       ctx.drawImage(readyButtonDisabled, 52, 343, 216, 99);
       $canvas.addEventListener('touchstart', setReady, false);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#BC31AF';
+      ctx.font='133px BigNoodle';
+      ctx.fillText(ownScore + ' - ' + strangerScore, 160, 200);
+      ctx.font='33px BigNoodle';
+      ctx.fillText('You        Opponent', 169, 250);
+
 
 
     }else{
@@ -198,14 +209,16 @@ const _onFrame = () => {
       ctx.rect(0, 0, 320, 568);
       ctx.fill();
       ctx.drawImage(readyButtonEnabled, 52, 343, 216, 99);
+      ctx.fillStyle = '#00B3CC';
+      ctx.font='133px BigNoodle';
+      ctx.fillText(ownScore + ' - ' + strangerScore, 160, 200);
+      ctx.font='33px BigNoodle';
+      ctx.fillText('You        Opponent', 169, 250);
     }
 
-    ctx.fillStyle = 'red';
-    ctx.font='60px Georgia';
-    ctx.fillText(ownScore, 100, 150);
 
-    ctx.font='60px Georgia';
-    ctx.fillText(strangerScore, 210, 150);
+
+
 
   }
   requestAnimationFrame(() => _onFrame()); //lus om te blijven uitvoeren voor animatie

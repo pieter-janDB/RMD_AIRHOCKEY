@@ -1,0 +1,7 @@
+@font-face {
+    font-family: 'BigNoodle';
+    src: url('big_noodle_titling.woff') format('woff'),
+       url('big_noodle_titling.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}

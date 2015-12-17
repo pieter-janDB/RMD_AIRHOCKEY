@@ -10,6 +10,7 @@ import {Ball, Player} from './game/';
 import {$, html} from './helpers/util.js';
 import userTpl from '../_hbs/user';
 import Status from '../models/Status.js';
+import {AudioPlayer, BufferLoader} from './modules/sound';
 
 
 let player, ball;
@@ -23,17 +24,24 @@ let backgroundInGame, backgroundAlign, backgroundAlignReady, paddleYou, paddleOp
 let startsWithBall = false;
 let gameRunning;
 
+
 //readybutton coords
 let rdyX = 52;
 let rdyY = 343;
 let rdyWidth = 216;
 let rdyHeight = 99;
 
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioPlayer;
+let audioContext = new AudioContext();
+
 let $canvas = document.querySelector('#canvas');
 let ctx = $canvas.getContext('2d');
 
 const init = () => {
     //SOCKET.IO
+  audioContext = new AudioContext();
+  audioPlayer = new AudioPlayer(audioContext);
   initSocket();
   loadAssets();
 
@@ -73,11 +81,12 @@ const showStartScreen = () => {
   ctx.font='60px Georgia';
   ctx.fillText('player ' + socket.playerNumber, 80, 220);
 
-  $canvas.addEventListener('touchstart', setReady, false);f
+  $canvas.addEventListener('touchstart', setReady, false);
 };
 
 const setReady = e => {
 
+  audioPlayer.playSound();
 
 
 
@@ -252,6 +261,7 @@ const update3 = () => {
   if(ballOnScreen){
     if(ball.overTheEdge()){
       console.log('play sound');
+      audioPlayer.play(ball);
       newOverlapping();
 
     }

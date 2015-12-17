@@ -16,16 +16,18 @@ let Victor = require('victor');
 export default class Player extends EventEmitter{
 
 
-  constructor(){
+  constructor(paddleImg){
 
     super(); //roept super van eventemitter op anders zal het niet werken
     this.radius = 40;
     this.fill = 'red';
-    this.topSpeed = 18;
+    this.topSpeed = 23;
     this.ctx = $canvas.getContext('2d');
     this.playFieldWidth = 320;
     this.playFieldHeight = 492;
     this.mass = 75;
+
+    this.paddleImg = paddleImg;
 
     this.location = new Victor(160.0, 375.0);
     this.easing = new Victor(1, 1);
@@ -108,10 +110,12 @@ export default class Player extends EventEmitter{
 
   draw(){
 
-    this.ctx.fillStyle = '#00B3CC';
+    this.ctx.drawImage(this.paddleImg, this.location.x-this.radius, this.location.y-this.radius, this.radius*2, this.radius*2);
+
+    /*this.ctx.fillStyle = '#00B3CC';
     this.ctx.beginPath();
     this.ctx.arc(this.location.x, this.location.y, this.radius, 0, 2*Math.PI);
-    this.ctx.fill();
+    this.ctx.fill();*/
   }
 
   limitSpeed(limit){

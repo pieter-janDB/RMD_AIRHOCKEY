@@ -22,8 +22,8 @@ export const html = (strings, ...values) => {
 };
 
 export const mapRange = (value, low1, high1, low2, high2) => {
-    return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
-}
+  return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+};
 
 export const prepend = ($parent, $element) => {
   let $first = $parent.children[0];

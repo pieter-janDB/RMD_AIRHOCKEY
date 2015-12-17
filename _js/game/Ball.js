@@ -8,7 +8,7 @@ let Victor = require('victor');
 export default class Ball extends EventEmitter{
 
 
-  constructor(x, y, active, socket){
+  constructor(x, y, active, socket, puckImg){
 
     //topspeed laten meegeven selecteren in menu?
 
@@ -18,9 +18,10 @@ export default class Ball extends EventEmitter{
     this.y = y;
     this.radius = 20;
     this.fill = 'black';
-    this.topSpeed = 19;
+    this.topSpeed = 24;
     this.mass = 38;
     this.active = active;
+    this.puckImg = puckImg;
 
     this.ctx=document.querySelector('#canvas').getContext('2d');
     this.location = new Victor(this.x, this.y);
@@ -38,11 +39,14 @@ export default class Ball extends EventEmitter{
   }
 
   draw(){
-    this.ctx.fillStyle = 'black';
+    /*this.ctx.fillStyle = 'black';
     this.ctx.beginPath();
     this.ctx.arc(this.location.x, this.location.y, this.radius, 0, 2*Math.PI);
 
-    this.ctx.fill();
+    this.ctx.fill();*/
+
+    this.ctx.drawImage(this.puckImg, this.location.x-this.radius, this.location.y-this.radius, this.radius*2, this.radius*2);
+
 
     this.velocity.multiply(this.friction);
   }
@@ -102,7 +106,7 @@ export default class Ball extends EventEmitter{
   checkEdges(){
 
     if (this.location.y >= 492 - this.radius) {
-      if(this.location.x > 80 && this.location.x < 320-80){
+      if(this.location.x > 58 && this.location.x < 320-58){
         //binnen in goal
         if(!this.active)return;
         if(this.location.y >= 495) {

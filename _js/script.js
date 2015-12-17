@@ -5,7 +5,6 @@
 
 // import 'babel-core/polyfill';
 // or import specific polyfills
-import {mapRange} from './helpers/util';
 import {Ball, Player} from './game/';
 
 import {$, html} from './helpers/util.js';
@@ -20,9 +19,15 @@ let socketId;
 let ballOnScreen;
 let ownScore = 0;
 let strangerScore = 0;
-let scoreScreenImg, scoreScreenReadyImg;
+let backgroundInGame, backgroundAlign, backgroundAlignReady, paddleYou, paddleOpponent, puck, readyButtonDisabled, readyButtonEnabled, backgroundInGameOpponent;
 let startsWithBall = false;
 let gameRunning;
+
+//readybutton coords
+let rdyX = 52;
+let rdyY = 343;
+let rdyWidth = 216;
+let rdyHeight = 99;
 
 let $canvas = document.querySelector('#canvas');
 let ctx = $canvas.getContext('2d');
@@ -30,6 +35,8 @@ let ctx = $canvas.getContext('2d');
 const init = () => {
     //SOCKET.IO
   initSocket();
+  loadAssets();
+
 
 };
 //#-#-#-#-#-#-#-#-#-#-#-#- pregame functions -#-#-#-#-#-#-#-#-#-#-#-#
@@ -56,25 +63,13 @@ const hideList = () => {
 
 
 const showStartScreen = () => {
-
-  ctx.fillStyle = '#E4EEF9';
-  ctx.rect(0, 0, 320, 568);
-  ctx.fill();
+  //align phones
+  ctx.drawImage(backgroundAlign, 0, 0, 320, 492);
+  ctx.drawImage(readyButtonDisabled, 52, 343, 216, 99);
 
   ctx.fillStyle = 'red';
-  ctx.font='120px Georgia';
-  ctx.fillText(socket.playerNumber, 130, 200);
-
-  let boxX = 60;
-  let boxY = 270;
-  let boxWidth = 200;
-  let boxHeight = 80;
-
-  ctx.rect(boxX, boxY, boxWidth, boxHeight);
-  ctx.stroke();
-
-  ctx.font='50px Georgia';
-  ctx.fillText('ready', 100, boxY + boxHeight - 30);
+  ctx.font='60px Georgia';
+  ctx.fillText('player ' + socket.playerNumber, 80, 220);
 
   $canvas.addEventListener('touchstart', setReady, false);
 
@@ -84,29 +79,22 @@ const setReady = e => {
 
 
 
-  let boxX = 60;
-  let boxY = 270;
-  let boxWidth = 200;
-  let boxHeight = 80;
+
 
   e.preventDefault();
 
-  if(e.touches['0'].clientX > boxX && e.touches['0'].clientX < boxX + boxWidth && e.touches['0'].clientY > boxY && e.touches['0'].clientY < boxY + boxHeight){
+  if(e.touches['0'].clientX > rdyX && e.touches['0'].clientX < rdyX + rdyWidth && e.touches['0'].clientY > rdyY && e.touches['0'].clientY < rdyY + rdyHeight){
     if(socket.status === Status.paired){
-      ctx.fillStyle = '#E4EEF9';
-      ctx.rect(0, 0, 320, 568);
-      ctx.fill();
+      ctx.drawImage(backgroundAlignReady, 0, 0, 320, 492);
 
-      ctx.fillStyle = 'green';
-      ctx.font='120px Georgia';
-      ctx.fillText(socket.playerNumber, 130, 200);
+      ctx.fillStyle = '#00B3CC';
+      ctx.font='60px Georgia';
+      ctx.fillText('player ' + socket.playerNumber, 80, 220);
 
-      ctx.rect(boxX, boxY, boxWidth, boxHeight);
-      ctx.stroke();
+      ctx.drawImage(readyButtonEnabled, 52, 343, 216, 99);
 
-      ctx.font='50px Georgia';
-      ctx.fillText('ready', 100, boxY + boxHeight - 30);
       socket.status = Status.ready;
+
     }else if(socket.status === Status.scoreScreen){
       socket.status = Status.ready;
 
@@ -121,27 +109,47 @@ const setReady = e => {
 
 const setupGame = () => {
 
-
-
-    //load graphics
-  scoreScreenImg = new Image();   // Create new img element
-  scoreScreenReadyImg = new Image();
-
-  scoreScreenReadyImg.src = './data/scoreRdy.png';
-  scoreScreenImg.src = './data/scoreNotRdy.png';
-
-  //if ready => start Game loop
-  //gebeurd in socket.on('sendStatus'... (als alle2 ready zijn)
-
   resetPositionsAndTouch();
 
   _onFrame();
 };
 
+const loadAssets = () => {
+
+  backgroundAlign = new Image();   // Create new img element
+  backgroundAlignReady = new Image();
+  paddleYou = new Image();   // Create new img element
+  paddleOpponent = new Image();
+  puck = new Image();
+  readyButtonDisabled = new Image();
+  readyButtonEnabled = new Image();
+  backgroundInGame = new Image();
+  backgroundInGameOpponent = new Image();
+
+
+
+  backgroundAlign.src = './assets/images/backgroundAlign.png';
+  backgroundAlignReady.src = './assets/images/backgroundAlignDone.png';
+  paddleYou.src = './assets/images/paddleYou.png';
+  paddleOpponent.src = './assets/images/paddleOpponent.png';
+  puck.src = './assets/images/puck.png';
+  readyButtonDisabled.src = './assets/images/readyButtonOFF.png';
+  readyButtonEnabled.src = './assets/images/readyButtonON.png';
+  backgroundInGame.src = './assets/images/BackgroundInGame.png';
+  backgroundInGameOpponent.src = './assets/images/backgroundInGameOpponent.png';
+
+};
+
 const resetPositionsAndTouch = () => {
-  player = new Player();
+  console.log(socket.playerNumber);
+  if(socket.playerNumber === 1){
+    player = new Player(paddleYou);
+  }else{
+    player = new Player(paddleOpponent);
+  }
+
   if(startsWithBall){
-    ball = new Ball(160.0, 300.0, true, socket);
+    ball = new Ball(160.0, 300.0, true, socket, puck);
     ballOnScreen = true;
   }
   $canvas.removeEventListener('touchstart', setReady, false);
@@ -155,8 +163,12 @@ const _onFrame = () => {
     ctx.fillStyle = '#E4EEF9';
     ctx.rect(0, 0, 320, 568);
     ctx.fill();
+    if(socket.playerNumber === 1){
+      ctx.drawImage(backgroundInGame, 0, 0, 320, 492);
+    }else{
+      ctx.drawImage(backgroundInGameOpponent, 0, 0, 320, 492);
+    }
 
-    ctx.fillStyle = '#00B3CC';
 
     update3();
 
@@ -164,10 +176,16 @@ const _onFrame = () => {
 
   // execute drawImage statements here
     if(socket.status === Status.scoreScreen){
-      ctx.drawImage(scoreScreenImg, 0, 0);
+      ctx.fillStyle = '#E4EEF9';
+      ctx.rect(0, 0, 320, 568);
+      ctx.fill();
+      ctx.drawImage(readyButtonDisabled, 52, 343, 216, 99);
       $canvas.addEventListener('touchstart', setReady, false);
     }else{
-      ctx.drawImage(scoreScreenReadyImg, 0, 0);
+      ctx.fillStyle = '#E4EEF9';
+      ctx.rect(0, 0, 320, 568);
+      ctx.fill();
+      ctx.drawImage(readyButtonEnabled, 52, 343, 216, 99);
     }
 
     ctx.fillStyle = 'red';
@@ -232,11 +250,16 @@ const update3 = () => {
 
 
   if(ballOnScreen){
+    if(ball.overTheEdge()){
+      console.log('play sound');
+      newOverlapping();
+
+    }
     ball.update();
 
     if(checkCollision()){
       manageBounce();
-      extraBounce(20); // 1-20
+      extraBounce();
 
       while(checkCollision()){
 
@@ -247,6 +270,7 @@ const update3 = () => {
       }
     }
     ball.draw();
+
   }
   player.update();
   player.draw();
@@ -259,7 +283,7 @@ const update3 = () => {
 const spawnBall = data => {
   ballOnScreen = true;
   //radius hard coded 20
-  ball = new Ball(320 - data.location.x, data.location.y - 20, true, socket);
+  ball = new Ball(320 - data.location.x, data.location.y - 20, true, socket, puck);
   ball.setVelocity(-data.velocity.x, -data.velocity.y);
 };
 
@@ -278,13 +302,10 @@ const checkCollision = () => {
 
 };
 
-const extraBounce = (amount) => {
+const extraBounce = () => {
 
-  let fixedAmount = mapRange(amount, 1, 20, 20, 1);
-  console.log(fixedAmount);
-  console.log ('x+ = ' + ((ball.location.x - player.location.x)/(ball.radius+player.radius))/amount + 'y+ = ' + ((ball.location.y - player.location.y)/(ball.radius+player.radius))/amount);
-  ball.velocity.x += ((ball.location.x - player.location.x)/(ball.radius+player.radius))/amount;
-  ball.velocity.y += ((ball.location.y - player.location.y)/(ball.radius+player.radius))/amount;
+  ball.velocity.x += ((ball.location.x - player.location.x)/(ball.radius+player.radius));
+  ball.velocity.y += ((ball.location.y - player.location.y)/(ball.radius+player.radius));
 
 };
 
@@ -292,7 +313,6 @@ const extraBounce = (amount) => {
 
 
 const fixOverlapping = () => {
-
   let midpointx = (player.location.x + ball.location.x) / 2;
   let midpointy = (player.location.y + ball.location.y) / 2;
   let dist = Math.sqrt(Math.pow(ball.location.x - player.location.x, 2) + Math.pow(ball.location.y - player.location.y, 2));

@@ -144,14 +144,14 @@ const loadAssets = () => {
 
   //backgroundAlign.src = asset_path('/assets/images/backgroundAlign.png');
   //backgroundAlign.src = '/assets/images/backgroundAlign.png';
-  backgroundAlignReady.src = './assets/images/backgroundAlignDone.png';
-  paddleYou.src = './assets/images/paddleYou.png';
-  paddleOpponent.src = 'i./assets/paddleOpponent.png';
+  backgroundAlignReady.src = './assets/images/backgroundaligndone.png';
+  paddleYou.src = './assets/images/paddleyou.png';
+  paddleOpponent.src = 'i./assets/paddleopponent.png';
   puck.src = './assets/images/puck.png';
-  readyButtonDisabled.src = './assets/images/readyButtonOFF.png';
-  readyButtonEnabled.src = './assets/images/readyButtonON.png';
-  backgroundInGame.src = './assets/images/BackgroundInGame.png';
-  backgroundInGameOpponent.src = './assets/backgroundInGameOpponent.png';
+  readyButtonDisabled.src = './assets/images/readybuttonoff.png';
+  readyButtonEnabled.src = './assets/images/readybuttonon.png';
+  backgroundInGame.src = './assets/images/backgroundingame.png';
+  backgroundInGameOpponent.src = './assets/backgroundingameopponent.png';
 
   //SOUNDS
 

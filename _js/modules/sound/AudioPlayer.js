@@ -11,7 +11,7 @@ export default class AudioPlayer {
   }
   playSound(){
     let source = this.ctx.createOscillator();
-    source.frequency.value = 3000;
+    source.frequency.value = 200;
 
 
 

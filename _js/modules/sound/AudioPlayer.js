@@ -11,21 +11,21 @@ export default class AudioPlayer {
   }
   playSound(){
     let source = this.ctx.createOscillator();
-    source.frequency.value = 3000;
+    source.frequency.value = 200;
 
 
 
     source.connect(this.ctx.destination);
-    source.start();
+    source.start(0);
     source.stop(this.ctx.currentTime + 0.2);
 
   }
 
-  play(ball){
+  play(ball, player){
 
     let source = this.ctx.createOscillator();
-    source.frequency.value = 1000;
-
+    source.frequency.value = 300 + ball.location.y / 2.5;
+    console.log(source.frequency.value);
 
 
 
@@ -40,7 +40,7 @@ export default class AudioPlayer {
     panner.setPosition(panning, 0, 1 - Math.abs(panning));
 
     let volume = SoundUtil.getVolume(bounds, ball.location.y);
-    let realVolume = mapRange((Math.abs(ball.velocity.x) + Math.abs(ball.velocity.y)/2), 0, ball.topSpeed, 0, 1);
+    let realVolume = mapRange((Math.abs(ball.velocity.x) + Math.abs(ball.velocity.y)/2), 0, ball.topSpeed, 0.4, 1);
 
     console.log('premap' + (Math.abs(ball.velocity.x) + Math.abs(ball.velocity.y)/2));
     console.log(realVolume);
@@ -59,7 +59,7 @@ export default class AudioPlayer {
     //source.connect(this.ctx.destination);
 
 
-    source.start();
+    source.start(0, 0.25);
     source.stop(this.ctx.currentTime + 0.2);
   }
 

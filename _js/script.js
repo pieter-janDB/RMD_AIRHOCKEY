@@ -10,7 +10,7 @@ import {Ball, Player} from './game/';
 import {$, html} from './helpers/util.js';
 import userTpl from '../_hbs/user';
 import Status from '../models/Status.js';
-import {AudioPlayer, BufferLoader} from './modules/sound';
+import {AudioPlayer, BufferLoader, AudioController} from './modules/sound';
 
 
 let player, ball;
@@ -49,6 +49,8 @@ const init = () => {
   //setupGame();
 
 };
+
+
 //#-#-#-#-#-#-#-#-#-#-#-#- pregame functions -#-#-#-#-#-#-#-#-#-#-#-#
 
 const matchPlayers = (e) => {
@@ -86,15 +88,13 @@ const showStartScreen = () => {
 
 const setReady = e => {
 
-  audioPlayer.playSound();
-
-
 
 
   e.preventDefault();
 
   if(e.touches['0'].clientX > rdyX && e.touches['0'].clientX < rdyX + rdyWidth && e.touches['0'].clientY > rdyY && e.touches['0'].clientY < rdyY + rdyHeight){
     if(socket.status === Status.paired){
+      audioPlayer.playSound();
       ctx.drawImage(backgroundAlignReady, 0, 0, 320, 492);
 
       ctx.fillStyle = '#00B3CC';
@@ -191,6 +191,8 @@ const _onFrame = () => {
       ctx.fill();
       ctx.drawImage(readyButtonDisabled, 52, 343, 216, 99);
       $canvas.addEventListener('touchstart', setReady, false);
+
+
     }else{
       ctx.fillStyle = '#E4EEF9';
       ctx.rect(0, 0, 320, 568);
@@ -209,59 +211,13 @@ const _onFrame = () => {
   requestAnimationFrame(() => _onFrame()); //lus om te blijven uitvoeren voor animatie
 };
 
-const update1 = () => {
-
-  player.update();
-  player.draw();
-  if(ballOnScreen){
-
-    if(!checkCollision){
-      ball.update();
-    }
-    while(checkCollision()){
-
-      extraBounce();
-
-      //manageBounce();
-      //
-      ball.update();
-      //fixOverlapping();
-    }
-    ball.update();
-    ball.draw();
-  }
-};
-
-const update2 = () => {
-  if(ballOnScreen){
-    ball.update();
-
-    if(checkCollision()){
-
-      manageBounce();
-      extraBounce();
-      fixOverlapping();
-      player.update();
-
-    }else{
-      player.update();
-    }
-
-    ball.draw();
-  }else{
-    player.update();
-  }
-  player.draw();
-
-};
-
 const update3 = () => {
 
 
   if(ballOnScreen){
     if(ball.overTheEdge()){
       console.log('play sound');
-      audioPlayer.play(ball);
+      audioPlayer.play(ball, player);
       newOverlapping();
 
     }
@@ -286,9 +242,6 @@ const update3 = () => {
   player.draw();
 
 };
-
-
-
 
 const spawnBall = data => {
   ballOnScreen = true;
@@ -316,19 +269,6 @@ const extraBounce = () => {
 
   ball.velocity.x += ((ball.location.x - player.location.x)/(ball.radius+player.radius));
   ball.velocity.y += ((ball.location.y - player.location.y)/(ball.radius+player.radius));
-
-};
-
-
-
-
-const fixOverlapping = () => {
-  let midpointx = (player.location.x + ball.location.x) / 2;
-  let midpointy = (player.location.y + ball.location.y) / 2;
-  let dist = Math.sqrt(Math.pow(ball.location.x - player.location.x, 2) + Math.pow(ball.location.y - player.location.y, 2));
-
-  ball.location.x = midpointx + ((player.radius +ball.radius )/2) * (ball.location.x - player.location.x) / dist;
-  ball.location.y = midpointy + ((player.radius +ball.radius )/2) * (ball.location.y - player.location.y) / dist;
 
 };
 
@@ -393,7 +333,6 @@ const initSocket = () => {
         if(client.socketId !== socketId){
 
           $client.querySelector('.connect').addEventListener('click', e => {
-
             e.preventDefault();
             matchPlayers(e);
           });

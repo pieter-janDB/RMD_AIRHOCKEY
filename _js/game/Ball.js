@@ -3,6 +3,16 @@
 //import {MathUtil, SoundUtil} from '../util/';
 
 import EventEmitter from 'eventemitter2';
+
+import SoundUtil from '../modules/util/SoundUtil';
+// import {Player, BufferLoader} from '../modules/sound/';
+import Player from '../modules/sound/Player';
+import BufferLoader from '../modules/sound/BufferLoader';
+import sets from '../data/sets.js';
+
+let audioPlayer; //Player
+
+
 let Victor = require('victor');
 
 export default class Ball extends EventEmitter{

@@ -38,6 +38,8 @@ const init = () => {
   loadAssets();
 
 
+  //setupGame();
+
 };
 //#-#-#-#-#-#-#-#-#-#-#-#- pregame functions -#-#-#-#-#-#-#-#-#-#-#-#
 
@@ -71,8 +73,7 @@ const showStartScreen = () => {
   ctx.font='60px Georgia';
   ctx.fillText('player ' + socket.playerNumber, 80, 220);
 
-  $canvas.addEventListener('touchstart', setReady, false);
-
+  $canvas.addEventListener('touchstart', setReady, false);f
 };
 
 const setReady = e => {
@@ -223,7 +224,6 @@ const update1 = () => {
 };
 
 const update2 = () => {
-
   if(ballOnScreen){
     ball.update();
 

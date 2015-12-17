@@ -146,7 +146,7 @@ const loadAssets = () => {
   //backgroundAlign.src = '/assets/images/backgroundAlign.png';
   backgroundAlignReady.src = './assets/images/backgroundaligndone.png';
   paddleYou.src = './assets/images/paddleyou.png';
-  paddleOpponent.src = './assets/paddleopponent.png';
+  paddleOpponent.src = './assets/images/paddleopponent.png';
   puck.src = './assets/images/puck.png';
   readyButtonDisabled.src = './assets/images/readybuttonoff.png';
   readyButtonEnabled.src = './assets/images/readybuttonon.png';

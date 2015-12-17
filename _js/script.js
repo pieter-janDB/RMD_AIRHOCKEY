@@ -142,7 +142,7 @@ const loadAssets = () => {
   backgroundInGame = new Image();
   backgroundInGameOpponent = new Image();
 
-  backgroundAlign.src = asset_path('/assets/images/backgroundAlign.png');
+  //backgroundAlign.src = asset_path('/assets/images/backgroundAlign.png');
   //backgroundAlign.src = '/assets/images/backgroundAlign.png';
   backgroundAlignReady.src = './assets/images/backgroundAlignDone.png';
   paddleYou.src = 'assets/images/paddleYou.png';

@@ -2,10 +2,14 @@
 
 module.exports = {
 
-  hitsounds: [
+  sounds: [
     {
-      name: 'BD',
-      file: '/assets/sound/bd.wav'
+      name: 'ready',
+      file: './assets/sounds/ready.wav'
+    },
+    {
+      name: 'goal',
+      file: './assets/sounds/ready.wav'
     }
   ]
 

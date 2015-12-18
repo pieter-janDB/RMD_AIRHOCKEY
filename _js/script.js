@@ -18,7 +18,7 @@ fallback.load({
 // import 'babel-core/polyfill';
 // or import specific polyfills
 import {Ball, Player} from './game/';
-
+import {sets} from './data/';
 import {$, html} from './helpers/util.js';
 import userTpl from '../_hbs/user';
 import Status from '../models/Status.js';
@@ -35,7 +35,7 @@ let strangerScore = 0;
 let backgroundInGame, backgroundAlign, backgroundAlignReady, paddleYou, paddleOpponent, puck, readyButtonDisabled, readyButtonEnabled, backgroundInGameOpponent;
 let startsWithBall = false;
 let gameRunning;
-
+let bufferLoader;
 
 //readybutton coords
 let rdyX = 52;
@@ -46,6 +46,7 @@ let rdyHeight = 99;
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioPlayer;
 let audioContext = new AudioContext();
+let readySound;
 
 let $canvas = document.querySelector('#canvas');
 let ctx = $canvas.getContext('2d');
@@ -108,7 +109,7 @@ const setReady = e => {
 
   if(e.touches['0'].clientX > rdyX && e.touches['0'].clientX < rdyX + rdyWidth && e.touches['0'].clientY > rdyY && e.touches['0'].clientY < rdyY + rdyHeight){
     if(socket.status === Status.paired){
-      audioPlayer.playSound();
+      audioPlayer.playSound(readySound);
       ctx.drawImage(backgroundAlignReady, 0, 0, 320, 492);
 
       ctx.fillStyle = '#00B3CC';
@@ -142,6 +143,7 @@ const setupGame = () => {
 
 const loadAssets = () => {
 
+  //IMAGES
   backgroundAlign = new Image();   // Create new img element
   backgroundAlignReady = new Image();
   paddleYou = new Image();   // Create new img element
@@ -151,8 +153,6 @@ const loadAssets = () => {
   readyButtonEnabled = new Image();
   backgroundInGame = new Image();
   backgroundInGameOpponent = new Image();
-
-
 
   backgroundAlign.src = './assets/images/backgroundAlign.png';
   backgroundAlignReady.src = './assets/images/backgroundAlignDone.png';
@@ -164,7 +164,43 @@ const loadAssets = () => {
   backgroundInGame.src = './assets/images/BackgroundInGame.png';
   backgroundInGameOpponent.src = './assets/images/backgroundInGameOpponent.png';
 
+  //SOUNDS
+
+  loadSounds();
+
+
+
+
 };
+
+const loadSounds = () => {
+
+
+
+  // Create and Initialize the Audio Context
+  readySound; // Create the Sound
+  let getSound = new XMLHttpRequest(); // Load the Sound with XMLHttpRequest
+  getSound.open("GET", "./assets/sounds/ready.wav", true); // Path to Audio File
+  getSound.responseType = "arraybuffer"; // Read as Binary Data
+
+  getSound.onload = function() {
+
+    audioContext.decodeAudioData(getSound.response, function(buffer){
+          console.log(buffer);
+
+      readySound = buffer; // Decode the Audio Data and Store it in a Variable
+
+
+    });
+  }
+   console.log(readySound);
+  getSound.send(); // Send the Request and Load the File
+
+
+
+};
+
+
 
 const resetPositionsAndTouch = () => {
   console.log(socket.playerNumber);
@@ -242,7 +278,7 @@ const update3 = () => {
   if(ballOnScreen){
     if(ball.overTheEdge()){
       console.log('play sound');
-      audioPlayer.play(ball, player);
+      audioPlayer.play(ball);
       newOverlapping();
 
     }

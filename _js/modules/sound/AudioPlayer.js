@@ -9,19 +9,40 @@ export default class AudioPlayer {
     this.ctx = ctx;
 
   }
-  playSound(){
-    let source = this.ctx.createOscillator();
-    source.frequency.value = 200;
+  playSound(buffer){
+
+      /*let source = this.ctx.createOscillator();
+      source.frequency.value = 200;
 
 
 
-    source.connect(this.ctx.destination);
-    source.start(0);
-    source.stop(this.ctx.currentTime + 0.2);
+      source.connect(this.ctx.destination);
+      source.start(0);
+      source.stop(this.ctx.currentTime + 0.2);
+
+
+
+      source = this.ctx.createBufferSource();
+      source.buffer = fixed.sample;
+  */
+
+      ///
+
+
+        let source = this.ctx.createBufferSource(); // Declare a New Sound
+        source.buffer = buffer; // Attatch our Audio Data as it's Buffer
+        source.connect(this.ctx.destination);  // Link the Sound to the Output
+        source.start(0); // Play the Sound Immediately
+
+
+
+
+
+
 
   }
 
-  play(ball, player){
+  play(ball){
 
     let source = this.ctx.createOscillator();
     source.frequency.value = 300 + ball.location.y / 2.5;

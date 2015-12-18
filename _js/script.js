@@ -32,7 +32,7 @@ let readyKnopBounds = {
   y: 343,
   width: 216,
   height: 99
-}
+};
 let audioPlayer, readySound, hornSound;
 let audioContext = new AudioContext();
 

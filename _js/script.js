@@ -1,5 +1,17 @@
 'use strict';
 
+
+fallback.load({
+    'socket': [
+      '//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.7/socket.io.js',
+      'js/vendor/socket.io.js'
+    ]
+  });
+
+  fallback.ready(function(){
+    init();
+  });
+
 // some features need the be polyfilled..
 // https://babeljs.io/docs/usage/polyfill/
 
@@ -461,4 +473,4 @@ const initSocket = () => {
 
 
 
-init();
+// init();

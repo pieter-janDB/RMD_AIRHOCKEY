@@ -166,51 +166,31 @@ const loadAssets = () => {
   backgroundInGameOpponent.src = './assets/images/backgroundingameopponent.png';
 
   //SOUNDS
-
   loadSounds();
-
-
-
 
 };
 
 const loadSounds = () => {
-  // Create and Initialize the Audio Context
-   // Create the Sound
+
   let getSound = new XMLHttpRequest(); // Load the Sound with XMLHttpRequest
   getSound.open('GET', './assets/sounds/ready.wav', true); // Path to Audio File
   getSound.responseType = 'arraybuffer'; // Read as Binary Data
   getSound.onload = function() {
-
     audioContext.decodeAudioData(getSound.response, (buffer)=>{
-
-
       readySound = buffer; // Decode the Audio Data and Store it in a Variable
-
-
     });
   };
 
-  getSound.send(); // Send the Request and Load the File
-
-  // Create the Sound
+  getSound.send();
   let getSound2 = new XMLHttpRequest(); // Load the Sound with XMLHttpRequest
   getSound2.open('GET', './assets/sounds/horn.mp3', true); // Path to Audio File
   getSound2.responseType = 'arraybuffer'; // Read as Binary Data
   getSound2.onload = function() {
-
     audioContext.decodeAudioData(getSound2.response, (buffer)=>{
-
-
       hornSound = buffer; // Decode the Audio Data and Store it in a Variable
-
-
     });
   };
-
   getSound2.send(); // Send the Request and Load the File
-
-
 
 };
 
@@ -388,6 +368,7 @@ const manageBounce = () => {
 const initSocket = () => {
   //socket = io.connect('http://localhost:3000');
   socket = io();
+
   socket.on('init', clients => {
 
     if($clientsList){
@@ -401,6 +382,8 @@ const initSocket = () => {
         }
         let $client = html(userTpl(client));
         if(client.socketId !== socketId){
+
+
 
           $client.querySelector('.connect').addEventListener('click', e => {
             e.preventDefault();
@@ -446,10 +429,24 @@ const initSocket = () => {
 
   //als er iemand disconnect
   socket.on('leave', socketIdToRemove => {
-    if(socket.opponent === ''){
-      let $el = $(`[data-socketId='${socketIdToRemove}']`); //``backtabs
+    console.log(socketIdToRemove);
+    console.log(socket.opponent);
+    console.log(socket.status);
+    if(socket.status === Status.searching){
+       let $el = $(`[data-socketId='${socketIdToRemove}']`); //``backtabs
       $el.parentNode.removeChild($el);
     }
+  });
+
+  socket.on('checkOpponent', socketIdToCheck => {
+
+     if(socket.opponent === socketIdToCheck){
+
+        console.log('he left');
+        location.reload();
+
+      }
+
   });
 
   //als er op jouw naam geklikt is

@@ -27,10 +27,15 @@ module.exports.register = (server, options, next) => {
       );
 
       socket.broadcast.emit('leave', socket.id);
+      socket.broadcast.emit('checkOpponent', socket.id);
     });
 
     socket.on('leaveList', socketIdToRemove => {
-
+      console.log(socket.opponent);
+      console.log(socketIdToRemove);
+      if(socket.opponent === socketIdToRemove){
+        console.log('mijn tegenstander is weg');
+      }
       clients = clients.filter(
         c => c.socketId !== socketIdToRemove
       );

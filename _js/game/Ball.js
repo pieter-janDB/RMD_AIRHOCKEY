@@ -154,15 +154,17 @@ export default class Ball extends EventEmitter{
     //zijkanten
     if ((this.location.x >= 320-this.radius) || (this.location.x <= this.radius) || this.location.y >= 492 - this.radius) {
       if(this.location.y >= 492-this.radius){
-        if(this.location.x > 58 || this.location.x < 320-58){
+        if(this.location.x > 58 && this.location.x < 320-58){
+          console.log('check');
           return false;
         }
-
+        console.log('check2');
+        return true;
       }
-
-
+      console.log('check3');
       return true;
     }else{
+      console.log('check4');
       return false;
     }
   }

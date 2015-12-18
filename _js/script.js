@@ -34,7 +34,7 @@ let rdyHeight = 99;
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioPlayer;
 let audioContext = new AudioContext();
-let readySound;
+let readySound, hornSound;
 
 let $canvas = document.querySelector('#canvas');
 let ctx = $canvas.getContext('2d');
@@ -46,8 +46,6 @@ const init = () => {
   initSocket();
   loadAssets();
 
-
-  //setupGame();
 
 };
 
@@ -97,7 +95,7 @@ const setReady = e => {
 
   if(e.touches['0'].clientX > rdyX && e.touches['0'].clientX < rdyX + rdyWidth && e.touches['0'].clientY > rdyY && e.touches['0'].clientY < rdyY + rdyHeight){
     if(socket.status === Status.paired){
-      audioPlayer.playSound(readySound);
+
       ctx.drawImage(backgroundAlignReady, 0, 0, 320, 492);
 
       ctx.fillStyle = '#00B3CC';
@@ -114,6 +112,7 @@ const setReady = e => {
       socket.status = Status.ready;
 
     }
+    audioPlayer.playSound(readySound);
 
     socket.emit('requestStatus', {
       from: socketId,
@@ -163,19 +162,15 @@ const loadAssets = () => {
 };
 
 const loadSounds = () => {
-
-
-
   // Create and Initialize the Audio Context
-  readySound; // Create the Sound
+   // Create the Sound
   let getSound = new XMLHttpRequest(); // Load the Sound with XMLHttpRequest
   getSound.open("GET", "./assets/sounds/ready.wav", true); // Path to Audio File
   getSound.responseType = "arraybuffer"; // Read as Binary Data
-
   getSound.onload = function() {
 
     audioContext.decodeAudioData(getSound.response, function(buffer){
-          console.log(buffer);
+
 
       readySound = buffer; // Decode the Audio Data and Store it in a Variable
 
@@ -185,6 +180,23 @@ const loadSounds = () => {
 
   getSound.send(); // Send the Request and Load the File
 
+  // Create the Sound
+  let getSound2 = new XMLHttpRequest(); // Load the Sound with XMLHttpRequest
+  getSound2.open("GET", "./assets/sounds/horn.mp3", true); // Path to Audio File
+  getSound2.responseType = "arraybuffer"; // Read as Binary Data
+  getSound2.onload = function() {
+
+    audioContext.decodeAudioData(getSound2.response, function(buffer){
+
+
+      hornSound = buffer; // Decode the Audio Data and Store it in a Variable
+
+
+    });
+  }
+
+  getSound2.send(); // Send the Request and Load the File
+
 
 
 };
@@ -192,7 +204,6 @@ const loadSounds = () => {
 
 
 const resetPositionsAndTouch = () => {
-  console.log(socket.playerNumber);
   if(socket.playerNumber === 1){
     player = new Player(paddleYou);
   }else{
@@ -221,7 +232,7 @@ const _onFrame = () => {
     }
 
 
-    update3();
+    update();
 
   }else{
 
@@ -261,14 +272,13 @@ const _onFrame = () => {
   requestAnimationFrame(() => _onFrame()); //lus om te blijven uitvoeren voor animatie
 };
 
-const update3 = () => {
+const update = () => {
 
 
   if(ballOnScreen){
     if(ball.overTheEdge()){
-      console.log('play sound');
       audioPlayer.play(ball);
-      newOverlapping();
+      fixOverlapping();
 
     }
     ball.update();
@@ -282,7 +292,7 @@ const update3 = () => {
         if(ball.overTheEdge()){
           stopPlayerUpdate();
         }
-        newOverlapping();
+        fixOverlapping();
       }
     }
     ball.draw();
@@ -322,15 +332,15 @@ const extraBounce = () => {
 
 };
 
-const newOverlapping = () => {
+const fixOverlapping = () => {
 
-  ball.location.x -= -ball.velocity.x/30;
-  ball.location.y -= -ball.velocity.y/30;
+  ball.location.x -= -ball.velocity.x*2;
+  ball.location.y -= -ball.velocity.y*2;
 };
 const stopPlayerUpdate = () => {
 
-  player.location.x -= -player.velocity.x/30;
-  player.location.y -= -player.velocity.y/30;
+  player.location.x -= -player.velocity.x/10;
+  player.location.y -= -player.velocity.y/10;
 };
 
 
@@ -344,14 +354,11 @@ const manageBounce = () => {
   let direction1 = Math.atan2(player.velocity.y, player.velocity.x);
   let direction2 = Math.atan2(ball.velocity.y, ball.velocity.x);
   let newVelocityX1 = magnitude1*Math.cos(direction1-collisionisionAngle);
-
   let newVelocityY1 = magnitude1*Math.sin(direction1-collisionisionAngle);
   let newVelocityX2 = magnitude2*Math.cos(direction2-collisionisionAngle);
   let newVelocityY2 = magnitude2*Math.sin(direction2-collisionisionAngle);
-
   let finalVelocityX1 = ((player.mass-ball.mass)*newVelocityX1+(ball.mass+ball.mass)*newVelocityX2)/(player.mass+ball.mass);
   let finalVelocityX2 = ((player.mass+player.mass)*newVelocityX1+(ball.mass-player.mass)*newVelocityX2)/(player.mass+ball.mass);
-
   let finalVelocityY1 = newVelocityY1;
   let finalVelocityY2 = newVelocityY2;
 
@@ -487,7 +494,7 @@ const initSocket = () => {
   });
 
   socket.on('gescoord', () => {
-    console.log('joepie goal');
+    audioPlayer.playSound(hornSound);
     ownScore++;
     socket.status = Status.scoreScreen;
     startsWithBall = false;

@@ -94,7 +94,7 @@ const showStartScreen = () => {
 
   ctx.fillStyle = '#BC31AF';
   ctx.font='90px BigNoodle';
-  ctx.fillText('player ' + socket.playerNumber, 50, 230);
+  ctx.fillText(`player ${socket.playerNumber}`, 50, 230);
   ctx.font='33px BigNoodle';
   ctx.fillText('Align your phones', 65, 155);
 
@@ -114,7 +114,7 @@ const setReady = e => {
 
       ctx.fillStyle = '#00B3CC';
       ctx.font='90px BigNoodle';
-      ctx.fillText('player ' + socket.playerNumber, 50, 230);
+      ctx.fillText(`player ${socket.playerNumber}`, 50, 230);
       ctx.font='33px BigNoodle';
       ctx.fillText('Align your phones', 65, 155);
 
@@ -256,7 +256,7 @@ const _onFrame = () => {
       ctx.textAlign = 'center';
       ctx.fillStyle = '#BC31AF';
       ctx.font='133px BigNoodle';
-      ctx.fillText(ownScore + ' - ' + strangerScore, 160, 200);
+      ctx.fillText(`${ownScore} - ${strangerScore}`, 160, 200);
       ctx.font='33px BigNoodle';
       ctx.fillText('You        Opponent', 169, 250);
 
@@ -269,7 +269,7 @@ const _onFrame = () => {
       ctx.drawImage(readyButtonEnabled, 52, 343, 216, 99);
       ctx.fillStyle = '#00B3CC';
       ctx.font='133px BigNoodle';
-      ctx.fillText(ownScore + ' - ' + strangerScore, 160, 200);
+      ctx.fillText(`${ownScore} - ${strangerScore}`, 160, 200);
       ctx.font='33px BigNoodle';
       ctx.fillText('You        Opponent', 169, 250);
     }

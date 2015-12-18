@@ -15,7 +15,7 @@ module.exports.register = (server, options, next) => {
 
     newClient.socketId = socket.id;
 
-    newClient.nickname = 'user: ' + maxId;
+    newClient.nickname = `user: ${maxId}`;
 
 
     clients.push(newClient);

@@ -150,15 +150,14 @@ export default class Ball extends EventEmitter{
     }
   }
 
-   overTheEdge(){
+  overTheEdge(){
     //zijkanten
     if ((this.location.x >= 320-this.radius) || (this.location.x <= this.radius) || this.location.y >= 492 - this.radius) {
       if(this.location.y >= 492-this.radius){
         if(this.location.x > 58 || this.location.x < 320-58){
-          console.log('out');
-        return false;
+          return false;
         }
- console.log(this.location.x + ' --- ' + this.location.y);
+
       }
 
 

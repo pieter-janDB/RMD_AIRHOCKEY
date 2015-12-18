@@ -1,16 +1,27 @@
 'use strict';
 
+
+fallback.load({
+  'socket': [
+    '//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.7/socket.io.js',
+    'js/vendor/socket.io.js'
+  ]
+});
+
+fallback.ready(() =>{
+  init();
+});
+
 // some features need the be polyfilled..
 // https://babeljs.io/docs/usage/polyfill/
 
 // import 'babel-core/polyfill';
 // or import specific polyfills
 import {Ball, Player} from './game/';
-import {sets} from './data/';
 import {$, html} from './helpers/util.js';
 import userTpl from '../_hbs/user';
 import Status from '../models/Status.js';
-import {AudioPlayer, BufferLoader, AudioController} from './modules/sound';
+import {AudioPlayer} from './modules/sound';
 
 
 let player, ball;
@@ -23,14 +34,12 @@ let strangerScore = 0;
 let backgroundInGame, backgroundAlign, backgroundAlignReady, paddleYou, paddleOpponent, puck, readyButtonDisabled, readyButtonEnabled, backgroundInGameOpponent;
 let startsWithBall = false;
 let gameRunning;
-let bufferLoader;
 
 //readybutton coords
 let rdyX = 52;
 let rdyY = 343;
 let rdyWidth = 216;
 let rdyHeight = 99;
-
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioPlayer;
 let audioContext = new AudioContext();
@@ -42,7 +51,11 @@ let ctx = $canvas.getContext('2d');
 const init = () => {
     //SOCKET.IO
   audioContext = new AudioContext();
+
   audioPlayer = new AudioPlayer(audioContext);
+
+//  audioPlayer = new AudioPlayer(audioContext);
+
   initSocket();
   loadAssets();
 
@@ -165,35 +178,35 @@ const loadSounds = () => {
   // Create and Initialize the Audio Context
    // Create the Sound
   let getSound = new XMLHttpRequest(); // Load the Sound with XMLHttpRequest
-  getSound.open("GET", "./assets/sounds/ready.wav", true); // Path to Audio File
-  getSound.responseType = "arraybuffer"; // Read as Binary Data
+  getSound.open('GET', './assets/sounds/ready.wav', true); // Path to Audio File
+  getSound.responseType = 'arraybuffer'; // Read as Binary Data
   getSound.onload = function() {
 
-    audioContext.decodeAudioData(getSound.response, function(buffer){
+    audioContext.decodeAudioData(getSound.response, (buffer)=>{
 
 
       readySound = buffer; // Decode the Audio Data and Store it in a Variable
 
 
     });
-  }
+  };
 
   getSound.send(); // Send the Request and Load the File
 
   // Create the Sound
   let getSound2 = new XMLHttpRequest(); // Load the Sound with XMLHttpRequest
-  getSound2.open("GET", "./assets/sounds/horn.mp3", true); // Path to Audio File
-  getSound2.responseType = "arraybuffer"; // Read as Binary Data
+  getSound2.open('GET', './assets/sounds/horn.mp3', true); // Path to Audio File
+  getSound2.responseType = 'arraybuffer'; // Read as Binary Data
   getSound2.onload = function() {
 
-    audioContext.decodeAudioData(getSound2.response, function(buffer){
+    audioContext.decodeAudioData(getSound2.response, (buffer)=>{
 
 
       hornSound = buffer; // Decode the Audio Data and Store it in a Variable
 
 
     });
-  }
+  };
 
   getSound2.send(); // Send the Request and Load the File
 
@@ -504,5 +517,3 @@ const initSocket = () => {
 };
 
 
-
-init();

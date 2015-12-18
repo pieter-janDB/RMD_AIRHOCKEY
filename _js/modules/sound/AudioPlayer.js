@@ -34,11 +34,11 @@ export default class AudioPlayer {
       ///
 
 
-        let source = this.ctx.createBufferSource(); // Declare a New Sound
-        source.buffer = buffer; // Attatch our Audio Data as it's Buffer
-        source.connect(this.ctx.destination);  // Link the Sound to the Output
-        source.start(0); // Play the Sound Immediately
-        //source.stop(this.ctx.currentTime + 0.87);
+  let source = this.ctx.createBufferSource(); // Declare a New Sound
+  source.buffer = buffer; // Attatch our Audio Data as it's Buffer
+  source.connect(this.ctx.destination);  // Link the Sound to the Output
+  source.start(0); // Play the Sound Immediately
+  //source.stop(this.ctx.currentTime + 0.87);
 
 
 

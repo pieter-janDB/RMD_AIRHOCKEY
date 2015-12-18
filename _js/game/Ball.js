@@ -4,11 +4,6 @@
 
 import EventEmitter from 'eventemitter2';
 
-<<<<<<< HEAD
-
-let audioPlayer; //Player
-=======
->>>>>>> eda2f20733993c9a9f9dc5f36b1b7b81fbc962bd
 let Victor = require('victor');
 
 export default class Ball extends EventEmitter{

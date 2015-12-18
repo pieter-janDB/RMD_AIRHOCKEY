@@ -8,11 +8,8 @@ fallback.load({
   ]
 });
 
-<<<<<<< HEAD
-fallback.ready(function(){
-=======
+
 fallback.ready(() =>{
->>>>>>> eda2f20733993c9a9f9dc5f36b1b7b81fbc962bd
   init();
 });
 
@@ -98,7 +95,7 @@ const showStartScreen = () => {
   ctx.fillStyle = '#BC31AF';
   ctx.font='90px BigNoodle';
   ctx.fillText('player ' + socket.playerNumber, 50, 230);
-  ctx.font='33px';
+  ctx.font='33px BigNoodle';
   ctx.fillText('Align your phones', 65, 155);
 
   $canvas.addEventListener('touchstart', setReady, false);
@@ -118,7 +115,7 @@ const setReady = e => {
       ctx.fillStyle = '#00B3CC';
       ctx.font='90px BigNoodle';
       ctx.fillText('player ' + socket.playerNumber, 50, 230);
-      ctx.font='33px';
+      ctx.font='33px BigNoodle';
       ctx.fillText('Align your phones', 65, 155);
 
       ctx.drawImage(readyButtonEnabled, 52, 343, 216, 99);
@@ -179,32 +176,18 @@ const loadSounds = () => {
   // Create and Initialize the Audio Context
    // Create the Sound
   let getSound = new XMLHttpRequest(); // Load the Sound with XMLHttpRequest
-<<<<<<< HEAD
-  getSound.open("GET", './assets/sounds/ready.wav', true); // Path to Audio File
-  getSound.responseType = 'arraybuffer'; // Read as Binary Data
 
-  getSound.onload = function() {
-
-    audioContext.decodeAudioData(getSound.response, function(buffer){
-=======
   getSound.open('GET', './assets/sounds/ready.wav', true); // Path to Audio File
   getSound.responseType = 'arraybuffer'; // Read as Binary Data
   getSound.onload = function() {
 
     audioContext.decodeAudioData(getSound.response, (buffer)=>{
 
-
       readySound = buffer; // Decode the Audio Data and Store it in a Variable
->>>>>>> eda2f20733993c9a9f9dc5f36b1b7b81fbc962bd
-
-    readySound = buffer; // Decode the Audio Data and Store it in a Variable
 
     });
-<<<<<<< HEAD
-  }
-=======
+
   };
->>>>>>> eda2f20733993c9a9f9dc5f36b1b7b81fbc962bd
 
   getSound.send(); // Send the Request and Load the File
 

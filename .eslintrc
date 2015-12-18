@@ -189,6 +189,10 @@
     "no-magic-numbers": 0,
     "no-empty-pattern": 2,
     "no-negated-condition": 2
-  }
+  },
+   "globals": {
+        "io": true,
+        "fallback": false
+    }
 
 }

@@ -4,8 +4,11 @@
 
 import EventEmitter from 'eventemitter2';
 
+<<<<<<< HEAD
 
 let audioPlayer; //Player
+=======
+>>>>>>> eda2f20733993c9a9f9dc5f36b1b7b81fbc962bd
 let Victor = require('victor');
 
 export default class Ball extends EventEmitter{
@@ -21,7 +24,7 @@ export default class Ball extends EventEmitter{
     this.y = y;
     this.radius = 20;
     this.fill = 'black';
-    this.topSpeed = 24;
+    this.topSpeed = 19;
     this.mass = 38;
     this.active = active;
     this.puckImg = puckImg;
@@ -113,7 +116,7 @@ export default class Ball extends EventEmitter{
         //binnen in goal
         if(!this.active)return;
         if(this.location.y >= 495) {
-          console.log('goal');
+
           this.socket.emit('goal', this.socket.id, this.socket.opponent);
           this.active = false;
         }
@@ -121,13 +124,13 @@ export default class Ball extends EventEmitter{
         //naast goal tegen onderkant
         if(!this.active)return;
         this.velocity.y = this.velocity.y * -1;
-        console.log('botsY');
+
         this.location.y = 492-this.radius;
       }
     }else if (this.location.y <= this.radius && this.velocity.y < 0){
       //bovenaan scherm, pass ball
       if(this.active){
-        console.log('send ball info');
+
         let data = {
           location: this.location,
           velocity: this.velocity,
@@ -146,15 +149,23 @@ export default class Ball extends EventEmitter{
     //zijkanten
     if ((this.location.x >= 320-this.radius) || (this.location.x <= this.radius)) {
       this.velocity.x = this.velocity.x * -1;
-      console.log('zijkant');
+
       if(this.location.x > 320-this.radius) this.location.x = 320-this.radius;
       if(this.location.x < this.radius) this.location.x = this.radius;
     }
   }
 
-   overTheEdge(){
+  overTheEdge(){
     //zijkanten
     if ((this.location.x >= 320-this.radius) || (this.location.x <= this.radius) || this.location.y >= 492 - this.radius) {
+      if(this.location.y >= 492-this.radius){
+        if(this.location.x > 58 || this.location.x < 320-58){
+          return false;
+        }
+
+      }
+
+
       return true;
     }else{
       return false;

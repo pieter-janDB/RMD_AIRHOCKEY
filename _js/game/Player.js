@@ -21,7 +21,7 @@ export default class Player extends EventEmitter{
     super(); //roept super van eventemitter op anders zal het niet werken
     this.radius = 40;
     this.fill = 'red';
-    this.topSpeed = 23;
+    this.topSpeed = 19;
     this.ctx = $canvas.getContext('2d');
     this.playFieldWidth = 320;
     this.playFieldHeight = 492;
@@ -74,6 +74,8 @@ export default class Player extends EventEmitter{
   }
 
   update(){
+
+
 
     this.velocity = this.mousepos.clone().subtract(this.location).multiply(this.easing);
     this.limitSpeed(this.topSpeed);

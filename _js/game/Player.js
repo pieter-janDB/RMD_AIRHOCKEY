@@ -20,7 +20,6 @@ export default class Player extends EventEmitter{
 
     super(); //roept super van eventemitter op anders zal het niet werken
     this.radius = 40;
-    this.fill = 'red';
     this.topSpeed = 19;
     this.ctx = $canvas.getContext('2d');
     this.playFieldWidth = 320;

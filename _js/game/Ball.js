@@ -18,7 +18,6 @@ export default class Ball extends EventEmitter{
     this.x = x;
     this.y = y;
     this.radius = 20;
-    this.fill = 'black';
     this.topSpeed = 19;
     this.mass = 38;
     this.active = active;

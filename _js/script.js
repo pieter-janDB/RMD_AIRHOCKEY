@@ -89,7 +89,7 @@ const hideList = () => {
 
 const showStartScreen = () => {
   //align phones
-  ctx.drawImage(backgroundAlign, 0, 0, 320, 492);
+  ctx.drawImage(backgroundAlign, 0, 1, 320, 492);
   ctx.drawImage(readyButtonDisabled, 52, 343, 216, 99);
 
   ctx.fillStyle = '#BC31AF';
@@ -109,6 +109,10 @@ const setReady = e => {
 
   if(e.touches['0'].clientX > rdyX && e.touches['0'].clientX < rdyX + rdyWidth && e.touches['0'].clientY > rdyY && e.touches['0'].clientY < rdyY + rdyHeight){
     if(socket.status === Status.paired){
+
+      ctx.fillStyle = '#E4EEF9';
+      ctx.rect(0, 0, 320, 568);
+      ctx.fill();
 
       ctx.drawImage(backgroundAlignReady, 0, 0, 320, 492);
 

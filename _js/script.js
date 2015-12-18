@@ -2,15 +2,15 @@
 
 
 fallback.load({
-    'socket': [
-      '//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.7/socket.io.js',
-      'js/vendor/socket.io.js'
-    ]
-  });
+  'socket': [
+    '//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.7/socket.io.js',
+    'js/vendor/socket.io.js'
+  ]
+});
 
-  fallback.ready(function(){
-    init();
-  });
+fallback.ready(function(){
+  init();
+});
 
 // some features need the be polyfilled..
 // https://babeljs.io/docs/usage/polyfill/
@@ -18,11 +18,10 @@ fallback.load({
 // import 'babel-core/polyfill';
 // or import specific polyfills
 import {Ball, Player} from './game/';
-import {sets} from './data/';
 import {$, html} from './helpers/util.js';
 import userTpl from '../_hbs/user';
 import Status from '../models/Status.js';
-import {AudioPlayer, BufferLoader, AudioController} from './modules/sound';
+import {AudioPlayer} from './modules/sound';
 
 
 let player, ball;
@@ -95,7 +94,7 @@ const showStartScreen = () => {
   ctx.fillStyle = '#BC31AF';
   ctx.font='90px BigNoodle';
   ctx.fillText('player ' + socket.playerNumber, 50, 230);
-  ctx.font='33px BigNoodle';
+  ctx.font='33px';
   ctx.fillText('Align your phones', 65, 155);
 
   $canvas.addEventListener('touchstart', setReady, false);
@@ -115,7 +114,7 @@ const setReady = e => {
       ctx.fillStyle = '#00B3CC';
       ctx.font='90px BigNoodle';
       ctx.fillText('player ' + socket.playerNumber, 50, 230);
-      ctx.font='33px BigNoodle';
+      ctx.font='33px';
       ctx.fillText('Align your phones', 65, 155);
 
       ctx.drawImage(readyButtonEnabled, 52, 343, 216, 99);
@@ -168,9 +167,6 @@ const loadAssets = () => {
 
   loadSounds();
 
-
-
-
 };
 
 const loadSounds = () => {
@@ -180,26 +176,23 @@ const loadSounds = () => {
   // Create and Initialize the Audio Context
   readySound; // Create the Sound
   let getSound = new XMLHttpRequest(); // Load the Sound with XMLHttpRequest
-  getSound.open("GET", "./assets/sounds/ready.wav", true); // Path to Audio File
-  getSound.responseType = "arraybuffer"; // Read as Binary Data
+  getSound.open("GET", './assets/sounds/ready.wav', true); // Path to Audio File
+  getSound.responseType = 'arraybuffer'; // Read as Binary Data
 
   getSound.onload = function() {
 
     audioContext.decodeAudioData(getSound.response, function(buffer){
-          console.log(buffer);
 
-      readySound = buffer; // Decode the Audio Data and Store it in a Variable
-
+    readySound = buffer; // Decode the Audio Data and Store it in a Variable
 
     });
   }
-   console.log(readySound);
+
   getSound.send(); // Send the Request and Load the File
 
 
 
 };
-
 
 
 const resetPositionsAndTouch = () => {

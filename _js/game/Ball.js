@@ -5,8 +5,6 @@
 import EventEmitter from 'eventemitter2';
 
 
-import sets from '../data/sets.js';
-
 let audioPlayer; //Player
 let Victor = require('victor');
 

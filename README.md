@@ -1,1 +1,2 @@
-# niewProject 0.1.0
+# DEVINE RMD3 EINDWERK AIRHOCKEY
+# BY: Pieter-Jan De Bruyne & Jil Lefebvre

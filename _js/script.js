@@ -1,6 +1,5 @@
 'use strict';
 
-
 fallback.load({
   'socket': [
     '//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.7/socket.io.js',
@@ -12,53 +11,41 @@ fallback.ready(() =>{
   init();
 });
 
-// some features need the be polyfilled..
-// https://babeljs.io/docs/usage/polyfill/
-
-// import 'babel-core/polyfill';
-// or import specific polyfills
-import {Ball, Player} from './game/';
-import {$, html} from './helpers/util.js';
+import {Ball, Player} from './modules/game/';
+import {$, html} from './modules/helpers/util.js';
 import userTpl from '../_hbs/user';
 import Status from '../models/Status.js';
 import {AudioPlayer} from './modules/sound';
 
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
 
 let player, ball;
-let socket;
+let socket, socketId;
+let gameRunning, ballOnScreen;
 let $clientsList = $('.clients');
-let socketId;
-let ballOnScreen;
 let ownScore = 0;
 let strangerScore = 0;
 let backgroundInGame, backgroundAlign, backgroundAlignReady, paddleYou, paddleOpponent, puck, readyButtonDisabled, readyButtonEnabled, backgroundInGameOpponent;
 let startsWithBall = false;
-let gameRunning;
-
-//readybutton coords
-let rdyX = 52;
-let rdyY = 343;
-let rdyWidth = 216;
-let rdyHeight = 99;
-window.AudioContext = window.AudioContext || window.webkitAudioContext;
-let audioPlayer;
+let readyKnopBounds = {
+  x: 52,
+  y: 343,
+  width: 216,
+  height: 99
+}
+let audioPlayer, readySound, hornSound;
 let audioContext = new AudioContext();
-let readySound, hornSound;
 
 let $canvas = document.querySelector('#canvas');
 let ctx = $canvas.getContext('2d');
 
 const init = () => {
-    //SOCKET.IO
+
   audioContext = new AudioContext();
-
   audioPlayer = new AudioPlayer(audioContext);
-
-//  audioPlayer = new AudioPlayer(audioContext);
 
   initSocket();
   loadAssets();
-
 
 };
 
@@ -88,12 +75,11 @@ const hideList = () => {
 
 const showStartScreen = () => {
   //align phones
-  ctx.drawImage(backgroundAlign, 0, 0, 320, 492);
-  ctx.drawImage(readyButtonDisabled, 52, 343, 216, 99);
-
+  ctx.drawImage(backgroundAlign, 0, 1, 320, 492);
+  ctx.drawImage(readyButtonDisabled, readyKnopBounds.x, readyKnopBounds.y, readyKnopBounds.width, readyKnopBounds.height);
   ctx.fillStyle = '#BC31AF';
   ctx.font='90px BigNoodle';
-  ctx.fillText('player ' + socket.playerNumber, 50, 230);
+  ctx.fillText(`player ${socket.playerNumber}`, 50, 230);
   ctx.font='33px BigNoodle';
   ctx.fillText('Align your phones', 65, 155);
 
@@ -102,22 +88,23 @@ const showStartScreen = () => {
 
 const setReady = e => {
 
-
-
   e.preventDefault();
-
-  if(e.touches['0'].clientX > rdyX && e.touches['0'].clientX < rdyX + rdyWidth && e.touches['0'].clientY > rdyY && e.touches['0'].clientY < rdyY + rdyHeight){
+  if(e.touches['0'].clientX > readyKnopBounds.x && e.touches['0'].clientX < readyKnopBounds.x + readyKnopBounds.width && e.touches['0'].clientY > readyKnopBounds.y && e.touches['0'].clientY < readyKnopBounds.y + readyKnopBounds.height){
     if(socket.status === Status.paired){
+
+      ctx.fillStyle = '#E4EEF9';
+      ctx.rect(0, 0, 320, 568);
+      ctx.fill();
 
       ctx.drawImage(backgroundAlignReady, 0, 0, 320, 492);
 
       ctx.fillStyle = '#00B3CC';
       ctx.font='90px BigNoodle';
-      ctx.fillText('player ' + socket.playerNumber, 50, 230);
+      ctx.fillText(`player ${socket.playerNumber}`, 50, 230);
       ctx.font='33px BigNoodle';
       ctx.fillText('Align your phones', 65, 155);
 
-      ctx.drawImage(readyButtonEnabled, 52, 343, 216, 99);
+      ctx.drawImage(readyButtonEnabled, readyKnopBounds.x, readyKnopBounds.y, readyKnopBounds.width, readyKnopBounds.height);
 
       socket.status = Status.ready;
 
@@ -134,80 +121,13 @@ const setReady = e => {
   }
 };
 
+//#-#-#-#-#-#-#-#-#-#-#-#- game functions -#-#-#-#-#-#-#-#-#-#-#-#
+
 const setupGame = () => {
 
   resetPositionsAndTouch();
 
   _onFrame();
-};
-
-const loadAssets = () => {
-
-  //IMAGES
-  backgroundAlign = new Image();   // Create new img element
-  backgroundAlignReady = new Image();
-  paddleYou = new Image();   // Create new img element
-  paddleOpponent = new Image();
-  puck = new Image();
-  readyButtonDisabled = new Image();
-  readyButtonEnabled = new Image();
-  backgroundInGame = new Image();
-  backgroundInGameOpponent = new Image();
-
-
-  backgroundAlign.src = './assets/images/backgroundalign.png';
-  backgroundAlignReady.src = './assets/images/backgroundaligndone.png';
-  paddleYou.src = './assets/images/paddleyou.png';
-  paddleOpponent.src = './assets/images/paddleopponent.png';
-  puck.src = './assets/images/puck.png';
-  readyButtonDisabled.src = './assets/images/readybuttonoff.png';
-  readyButtonEnabled.src = './assets/images/readybuttonon.png';
-  backgroundInGame.src = './assets/images/backgroundingame.png';
-  backgroundInGameOpponent.src = './assets/images/backgroundingameopponent.png';
-
-  //SOUNDS
-  loadSounds();
-
-};
-
-const loadSounds = () => {
-
-  let getSound = new XMLHttpRequest(); // Load the Sound with XMLHttpRequest
-  getSound.open('GET', './assets/sounds/ready.wav', true); // Path to Audio File
-  getSound.responseType = 'arraybuffer'; // Read as Binary Data
-  getSound.onload = function() {
-    audioContext.decodeAudioData(getSound.response, (buffer)=>{
-      readySound = buffer; // Decode the Audio Data and Store it in a Variable
-    });
-  };
-
-  getSound.send();
-  let getSound2 = new XMLHttpRequest(); // Load the Sound with XMLHttpRequest
-  getSound2.open('GET', './assets/sounds/horn.mp3', true); // Path to Audio File
-  getSound2.responseType = 'arraybuffer'; // Read as Binary Data
-  getSound2.onload = function() {
-    audioContext.decodeAudioData(getSound2.response, (buffer)=>{
-      hornSound = buffer; // Decode the Audio Data and Store it in a Variable
-    });
-  };
-  getSound2.send(); // Send the Request and Load the File
-
-};
-
-
-
-const resetPositionsAndTouch = () => {
-  if(socket.playerNumber === 1){
-    player = new Player(paddleYou);
-  }else{
-    player = new Player(paddleOpponent);
-  }
-
-  if(startsWithBall){
-    ball = new Ball(160.0, 300.0, true, socket, puck);
-    ballOnScreen = true;
-  }
-  $canvas.removeEventListener('touchstart', setReady, false);
 };
 
 const _onFrame = () => {
@@ -234,12 +154,12 @@ const _onFrame = () => {
       ctx.fillStyle = '#E4EEF9';
       ctx.rect(0, 0, 320, 568);
       ctx.fill();
-      ctx.drawImage(readyButtonDisabled, 52, 343, 216, 99);
+      ctx.drawImage(readyButtonDisabled, readyKnopBounds.x, readyKnopBounds.y, readyKnopBounds.width, readyKnopBounds.height);
       $canvas.addEventListener('touchstart', setReady, false);
       ctx.textAlign = 'center';
       ctx.fillStyle = '#BC31AF';
       ctx.font='133px BigNoodle';
-      ctx.fillText(ownScore + ' - ' + strangerScore, 160, 200);
+      ctx.fillText(`${ownScore} - ${strangerScore}`, 160, 200);
       ctx.font='33px BigNoodle';
       ctx.fillText('You        Opponent', 169, 250);
 
@@ -249,10 +169,10 @@ const _onFrame = () => {
       ctx.fillStyle = '#E4EEF9';
       ctx.rect(0, 0, 320, 568);
       ctx.fill();
-      ctx.drawImage(readyButtonEnabled, 52, 343, 216, 99);
+      ctx.drawImage(readyButtonEnabled, readyKnopBounds.x, readyKnopBounds.y, readyKnopBounds.width, readyKnopBounds.height);
       ctx.fillStyle = '#00B3CC';
       ctx.font='133px BigNoodle';
-      ctx.fillText(ownScore + ' - ' + strangerScore, 160, 200);
+      ctx.fillText(`${ownScore} - ${strangerScore}`, 160, 200);
       ctx.font='33px BigNoodle';
       ctx.fillText('You        Opponent', 169, 250);
     }
@@ -270,7 +190,7 @@ const update = () => {
 
   if(ballOnScreen){
     if(ball.overTheEdge()){
-      audioPlayer.play(ball);
+      audioPlayer.play(ball, player, 'wall');
       fixOverlapping();
 
     }
@@ -279,6 +199,7 @@ const update = () => {
     if(checkCollision()){
       manageBounce();
       extraBounce();
+      audioPlayer.play(ball, player, 'paddle');
 
       while(checkCollision()){
 
@@ -296,6 +217,20 @@ const update = () => {
 
 };
 
+const resetPositionsAndTouch = () => {
+  if(socket.playerNumber === 1){
+    player = new Player(paddleYou);
+  }else{
+    player = new Player(paddleOpponent);
+  }
+
+  if(startsWithBall){
+    ball = new Ball(160.0, 300.0, true, socket, puck);
+    ballOnScreen = true;
+  }
+  $canvas.removeEventListener('touchstart', setReady, false);
+};
+
 const spawnBall = data => {
   ballOnScreen = true;
   //radius hard coded 20
@@ -305,7 +240,6 @@ const spawnBall = data => {
 
 const checkCollision = () => {
   //check collision if true bereken de bounce
-
   let distance = Math.sqrt(Math.pow(ball.location.x - player.location.x, 2) + Math.pow(ball.location.y - player.location.y, 2));
   if (distance <= player.radius + ball.radius){
 
@@ -322,7 +256,6 @@ const extraBounce = () => {
 
   ball.velocity.x += ((ball.location.x - player.location.x)/(ball.radius+player.radius));
   ball.velocity.y += ((ball.location.y - player.location.y)/(ball.radius+player.radius));
-
 };
 
 const fixOverlapping = () => {
@@ -354,16 +287,14 @@ const manageBounce = () => {
   let finalVelocityX2 = ((player.mass+player.mass)*newVelocityX1+(ball.mass-player.mass)*newVelocityX2)/(player.mass+ball.mass);
   let finalVelocityY1 = newVelocityY1;
   let finalVelocityY2 = newVelocityY2;
-
-
   player.velocity.x = Math.cos(collisionisionAngle)*finalVelocityX1+Math.cos(collisionisionAngle+Math.PI/2)*finalVelocityY1;
   player.velocity.y = Math.sin(collisionisionAngle)*finalVelocityX1+Math.sin(collisionisionAngle+Math.PI/2)*finalVelocityY1;
   ball.velocity.x = Math.cos(collisionisionAngle)*finalVelocityX2+Math.cos(collisionisionAngle+Math.PI/2)*finalVelocityY2;
   ball.velocity.y = Math.sin(collisionisionAngle)*finalVelocityX2+Math.sin(collisionisionAngle+Math.PI/2)*finalVelocityY2;
 
-
-
 };
+
+//#-#-#-#-#-#-#-#-#-#-#-#- setup functions -#-#-#-#-#-#-#-#-#-#-#-#
 
 const initSocket = () => {
   //socket = io.connect('http://localhost:3000');
@@ -383,8 +314,6 @@ const initSocket = () => {
         let $client = html(userTpl(client));
         if(client.socketId !== socketId){
 
-
-
           $client.querySelector('.connect').addEventListener('click', e => {
             e.preventDefault();
             matchPlayers(e);
@@ -401,7 +330,6 @@ const initSocket = () => {
             $clientsList.appendChild($client);
           }
         }else{
-
           $client.setAttribute('class', 'other');
           $clientsList.appendChild($client);
         }
@@ -421,32 +349,22 @@ const initSocket = () => {
     });
     $clientsList.appendChild($el);
   });
-
   //stel eigen id in als socketId
   socket.on('id', id => {
     socketId = id;
   });
-
-  //als er iemand disconnect
+  //als er iemand uit lijst gaat
   socket.on('leave', socketIdToRemove => {
-    console.log(socketIdToRemove);
-    console.log(socket.opponent);
-    console.log(socket.status);
     if(socket.status === Status.searching){
-       let $el = $(`[data-socketId='${socketIdToRemove}']`); //``backtabs
+      let $el = $(`[data-socketId='${socketIdToRemove}']`); //``backtabs
       $el.parentNode.removeChild($el);
     }
   });
-
+  //als tegenstander disconnect terug naar lijst
   socket.on('checkOpponent', socketIdToCheck => {
-
-     if(socket.opponent === socketIdToCheck){
-
-        console.log('he left');
-        location.reload();
-
-      }
-
+    if(socket.opponent === socketIdToCheck){
+      location.reload();
+    }
   });
 
   //als er op jouw naam geklikt is
@@ -497,20 +415,70 @@ const initSocket = () => {
     ballOnScreen = false;
   });
 
-  socket.on('tegengoal', () => {
+  socket.on('opponentScored', () => {
     strangerScore++;
     socket.status = Status.scoreScreen;
     startsWithBall = true;
   });
 
-  socket.on('gescoord', () => {
+  socket.on('youScored', () => {
     audioPlayer.playSound(hornSound);
     ownScore++;
     socket.status = Status.scoreScreen;
     startsWithBall = false;
   });
+};
 
+const loadAssets = () => {
+
+  loadImages();
+  loadSounds();
+};
+
+const loadImages = () => {
+
+  backgroundAlign = new Image();
+  backgroundAlignReady = new Image();
+  paddleYou = new Image();
+  paddleOpponent = new Image();
+  puck = new Image();
+  readyButtonDisabled = new Image();
+  readyButtonEnabled = new Image();
+  backgroundInGame = new Image();
+  backgroundInGameOpponent = new Image();
+
+  backgroundAlign.src = './assets/images/backgroundalign.png';
+  backgroundAlignReady.src = './assets/images/backgroundaligndone.png';
+  paddleYou.src = './assets/images/paddleyou.png';
+  paddleOpponent.src = './assets/images/paddleopponent.png';
+  puck.src = './assets/images/puck.png';
+  readyButtonDisabled.src = './assets/images/readybuttonoff.png';
+  readyButtonEnabled.src = './assets/images/readybuttonon.png';
+  backgroundInGame.src = './assets/images/backgroundingame.png';
+  backgroundInGameOpponent.src = './assets/images/backgroundingameopponent.png';
 
 };
 
+const loadSounds = () => {
 
+  let getSound = new XMLHttpRequest(); // Load the Sound with XMLHttpRequest
+  getSound.open('GET', './assets/sounds/ready.wav', true); // Path to Audio File
+  getSound.responseType = 'arraybuffer'; // Read as Binary Data
+  getSound.onload = function() {
+    audioContext.decodeAudioData(getSound.response, (buffer)=>{
+      readySound = buffer; // Decode the Audio Data and Store it in a Variable
+    });
+  };
+  getSound.send();
+
+  let getSound2 = new XMLHttpRequest(); // Load the Sound with XMLHttpRequest
+  getSound2.open('GET', './assets/sounds/horn.mp3', true); // Path to Audio File
+  getSound2.responseType = 'arraybuffer'; // Read as Binary Data
+  getSound2.onload = function() {
+    audioContext.decodeAudioData(getSound2.response, (buffer)=>{
+      hornSound = buffer; // Decode the Audio Data and Store it in a Variable
+    });
+  };
+  getSound2.send(); // Send the Request and Load the File
+
+};

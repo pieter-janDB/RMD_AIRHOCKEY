@@ -1,34 +1,22 @@
 'use strict';
 
-//import {MathUtil, SoundUtil} from '../util/';
-
 import EventEmitter from 'eventemitter2';
-
-
-
-//Variabelen
-
 
 let $canvas=document.querySelector('#canvas');
 let Victor = require('victor');
 
-
 export default class Player extends EventEmitter{
-
 
   constructor(paddleImg){
 
     super(); //roept super van eventemitter op anders zal het niet werken
     this.radius = 40;
-    this.fill = 'red';
     this.topSpeed = 19;
     this.ctx = $canvas.getContext('2d');
     this.playFieldWidth = 320;
     this.playFieldHeight = 492;
     this.mass = 75;
-
     this.paddleImg = paddleImg;
-
     this.location = new Victor(160.0, 375.0);
     this.easing = new Victor(1, 1);
     this.mousepos = new Victor(160.0, 375.0);
@@ -75,54 +63,22 @@ export default class Player extends EventEmitter{
 
   update(){
 
-
-
     this.velocity = this.mousepos.clone().subtract(this.location).multiply(this.easing);
     this.limitSpeed(this.topSpeed);
     this.location = this.location.add(this.velocity);
-
     //zie dat player in scherm blijft
     if(this.location.x < this.radius) this.location.x = this.radius;
     if(this.location.x > this.playFieldWidth - this.radius) this.location.x = this.playFieldWidth - this.radius;
     if(this.location.y < this.radius) this.location.y = this.radius;
     if(this.location.y > this.playFieldHeight - this.radius) this.location.y = this.playFieldHeight - this.radius;
-
-
-    //this.dir.normalize();
-    //this.dir.multiply(0.5, 0,5);
-    //this.acceleration = this.dir;
-    //this.acceleration = dir;
-    //this.velocity.add(this.acceleration);
-    //this.velocity.limit(this.topSpeed, 0.99);
-    //this.location.add(this.velocity);
-
-    //console.log(this.location.toString());
-
-    //this.checkEdges();
-
-
-    //this.velocity.add(this.acceleration);
-    //this.location.add(this.velocity);
-
-    //this.acceleration.mult(0);
-    //this.velocity.mult(0.95);
-
-
   }
 
   draw(){
 
     this.ctx.drawImage(this.paddleImg, this.location.x-this.radius, this.location.y-this.radius, this.radius*2, this.radius*2);
-
-    /*this.ctx.fillStyle = '#00B3CC';
-    this.ctx.beginPath();
-    this.ctx.arc(this.location.x, this.location.y, this.radius, 0, 2*Math.PI);
-    this.ctx.fill();*/
   }
 
   limitSpeed(limit){
-
-
 
     if(this.velocity.x > limit){
       this.oldVelocity = this.velocity.x;
@@ -161,13 +117,6 @@ export default class Player extends EventEmitter{
       }else{
         this.velocity.x = this.velocity.x / this.oldVelocity * -limit;
       }
-
     }
-
   }
-
-
-
-
 }
-

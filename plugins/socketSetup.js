@@ -8,20 +8,14 @@ module.exports.register = (server, options, next) => {
 
   io.on('connection', socket => {
 
-    //Redirect op terug in game komen na gsm uit ?
-
-
     let newClient = Object.assign({}, Client);
-
     newClient.socketId = socket.id;
-
-    newClient.nickname = 'user: ' + maxId;
-
-
+    newClient.nickname = `user: ${maxId}`;
     clients.push(newClient);
 
     //DISCONNECT
     socket.on('disconnect', () => {
+
       clients = clients.filter(
         c => c.socketId !== socket.id
       );
@@ -31,11 +25,7 @@ module.exports.register = (server, options, next) => {
     });
 
     socket.on('leaveList', socketIdToRemove => {
-      console.log(socket.opponent);
-      console.log(socketIdToRemove);
-      if(socket.opponent === socketIdToRemove){
-        console.log('mijn tegenstander is weg');
-      }
+
       clients = clients.filter(
         c => c.socketId !== socketIdToRemove
       );
@@ -43,10 +33,9 @@ module.exports.register = (server, options, next) => {
       socket.broadcast.emit('leave', socketIdToRemove);
     });
 
-
     socket.on('gameInvite', data => {
-      io.to(data.to).emit('gameInvite', data.from);
 
+      io.to(data.to).emit('gameInvite', data.from);
     });
 
     socket.emit('id', socket.id);
@@ -56,53 +45,45 @@ module.exports.register = (server, options, next) => {
     socket.broadcast.emit('join', newClient);
 
     socket.on('requestStatus', data => {
-      io.to(data.to).emit('requestStatus', data.from);
 
+      io.to(data.to).emit('requestStatus', data.from);
     });
 
     socket.on('sendStatus', data => {
-      io.to(data.to).emit('sendStatus', data.status);
 
+      io.to(data.to).emit('sendStatus', data.status);
     });
 
     socket.on('startGame', opponent => {
-      io.to(opponent).emit('readyToStart');
 
+      io.to(opponent).emit('readyToStart');
     });
 
 
     //GAMELOGICA
 
     socket.on('passBall', data => {
-      console.log('passing ball');
+
       io.to(data.to).emit('sendingBallData', data);
-
-
     });
 
     socket.on('hideBall', playerId => {
-      io.to(playerId).emit('hideBall');
 
+      io.to(playerId).emit('hideBall');
     });
 
     socket.on('goal', (playerId, opponentId) => {
-      io.to(playerId).emit('tegengoal');
-      io.to(opponentId).emit('gescoord');
 
+      io.to(playerId).emit('opponentScored');
+      io.to(opponentId).emit('youScored');
     });
 
     maxId++;
   });
 
-
-
-
-
-
-
-
   next();
 };
+
 module.exports.register.attributes = {
   name: 'socketConnect',
   version: '0.1.0'

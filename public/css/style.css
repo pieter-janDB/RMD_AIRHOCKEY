@@ -91,9 +91,6 @@ li {
 
 .other span {
   font-size: 2em;
-  color: white;
-  text-align: center;
-  display: block;
   padding: 2px;
 }
 
@@ -105,10 +102,13 @@ li {
 
 .self span {
   font-size: 2.5em;
+  padding-top: 20px;
+}
+
+.other span, .self span {
   color: white;
   text-align: center;
   display: block;
-  padding-top: 20px;
 }
 
 .connect {
